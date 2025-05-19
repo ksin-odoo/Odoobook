@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Mixins & Useful Classes: Medium Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem; /* Slightly reduced padding */
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .mixin-name-text {
+            font-family: 'Source Code Pro', monospace; background-color: #dbeafe; 
+            color: #1e40af; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .method-name-text {
+            font-family: 'Source Code Pro', monospace; background-color: #e0e7ff;
+            color: #3730a3; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text {
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-decorator { color: #61afef; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-num { color: #d19a66; } 
+        .code-block .py-param { color: #abb2bf; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;} 
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .xml-cmt { color: #5c6370; font-style: italic; } 
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .method-name-text, .list-item .field-name-text { font-size: 0.85rem; }
+        .deprecated { color: #ef4444; font-weight: 500; }
+
+        /* Category Colors */
+        .cat-intro { border-left-color: #6b7280; } .cat-intro .section-title { color: #4b5563; }
+        .cat-messaging { border-left-color: #3b82f6; } .cat-messaging .section-title { color: #2563eb; }
+        .cat-alias { border-left-color: #10b981; } .cat-alias .section-title { color: #059669; }
+        .cat-activities { border-left-color: #f59e0b; } .cat-activities .section-title { color: #d97706; }
+        .cat-website { border-left-color: #8b5cf6; } .cat-website .section-title { color: #7c3aed; }
+        .cat-rating { border-left-color: #ec4899; } .cat-rating .section-title { color: #db2777; }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Mixins & Useful Classes: Cheatsheet</h1>
+        <p class="subtitle">Quick reference for adding common features to your Odoo models.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-puzzle-piece"></i></span>1. About Mixins</h2>
+            <p class="description-text">
+                Odoo mixins are pre-built classes. Inherit them in your models to quickly add features like messaging or website integration. This cheatsheet covers key mixins.
+            </p>
+        </section>
+
+        <section class="section-card cat-messaging">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-comments"></i></span>2. Messaging / Chatter (<code class="mixin-name-text">mail.thread</code>)</h2>
+            <p class="description-text">
+                Adds messaging (chatter, notifications, followers) to models.
+            </p>
+            <h3 class="sub-section-title">Key Setup</h3>
+            <p class="description-text">
+                1. <strong>Python:</strong> Add <code class="mixin-name-text">mail.thread</code> to your model's <code class="field-name-text">_inherit</code> list.
+                2. <strong>XML View:</strong> In the form view, add the chatter components:
+            </p>
+            <div class="code-block"><pre><span class="cmt">&lt;!-- Inside &lt;form&gt; tag --&gt;</span>
+&lt;<span class="xml-tag">div</span> <span class="xml-attr">class</span>=<span class="xml-val">"oe_chatter"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"message_follower_ids"</span> <span class="xml-attr">widget</span>=<span class="xml-val">"mail_followers"</span>/&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"message_ids"</span> <span class="xml-attr">widget</span>=<span class="xml-val">"mail_thread"</span>/&gt;
+&lt;/<span class="xml-tag">div</span>&gt;</pre>
+            </div>
+
+            <h3 class="sub-section-title">Core Methods & Features</h3>
+            <ul class="list-item space-y-2">
+                <li><strong>Posting Messages:</strong>
+                    <ul class="list-disc pl-5 mt-1">
+                        <li><code class="method-name-text">message_post(...)</code>: Posts a message. For HTML <code class="field-name-text">body</code>, use <code class="field-name-text">Markup</code>.</li>
+                        <li><code class="method-name-text">message_post_with_view(view_xmlid, ...)</code>: Uses a QWeb view for message body.</li>
+                        <li><code class="method-name-text">message_post_with_template(template_id, ...)</code>: Uses a <code class="field-name-text">mail.template</code>.</li>
+                    </ul>
+                </li>
+                <li><strong>Receiving Emails (Mail Gateway):</strong>
+                     <ul class="list-disc pl-5 mt-1">
+                        <li><code class="method-name-text">message_new(msg_dict, custom_values)</code>: Creates new record from incoming email (via alias).</li>
+                        <li><code class="method-name-text">message_update(msg_dict, update_vals)</code>: Updates record from email reply.</li>
+                    </ul>
+                </li>
+                <li><strong>Followers:</strong> <code class="method-name-text">message_subscribe(partner_ids)</code> to add followers.</li>
+                <li><strong>Field Tracking:</strong> Set <code class="field-name-text">tracking=True</code> on a field definition to log its changes.</li>
+                <li><strong>Subtypes:</strong> Define <code class="field-name-text">mail.message.subtype</code> records (XML) to categorize notifications. Override <code class="method-name-text">_track_subtype(init_values)</code> to choose a subtype based on field changes.</li>
+                <li><strong>Custom Notifications:</strong> Override <code class="method-name-text">_notify_get_groups(...)</code> to customize email buttons/content per user group. Use <code class="method-name-text">_notify_get_action_link(...)</code> for button URLs.</li>
+                <li><strong>Control Behavior:</strong> Use context keys like <code class="field-name-text">mail_create_nosubscribe</code>, <code class="field-name-text">mail_notrack</code>.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-alias">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-at"></i></span>3. Mail Alias (<code class="mixin-name-text">mail.alias.mixin</code>)</h2>
+            <p class="description-text">
+                Creates records from emails sent to a model-specific email alias (e.g., <code class="field-name-text">project-tasks@yourdomain.com</code>).
+            </p>
+            <div class="important-note">The target model for the alias (e.g., 'project.task') must also inherit <code class="mixin-name-text">mail.thread</code>.</div>
+            <h3 class="sub-section-title">Key Setup & Overrides</h3>
+            <ul class="list-item space-y-2">
+                <li><strong>Inherit:</strong> Add <code class="mixin-name-text">mail.alias.mixin</code> to your Python model (that will have the alias).</li>
+                <li><code class="method-name-text">_get_alias_model_name(vals)</code>: **REQUIRED override.** Return string name of the model this alias creates (e.g., <code class="py-st">'project.task'</code>).</li>
+                <li><code class="method-name-text">_get_alias_values()</code>: **REQUIRED override.** Return dict of values for the <code class="field-name-text">mail.alias</code> record.
+                    Crucial: set <code class="field-name-text">'alias_defaults'</code>: a dict of default values for records created via the alias (e.g., <code class="py-st">{'project_id': self.id}</code>).
+                    Also set <code class="field-name-text">'alias_name'</code> (e.g., <code class="py-st">f'project-{self.id}-tasks'</code>) and <code class="field-name-text">'alias_contact'</code> ('everyone', 'partners', 'followers').
+                </li>
+            </ul>
+             <div class="code-block"><pre><span class="py-kw">class</span> <span class="py-cn">MyProject</span>(<span class="py-cn">models.Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">'my.project'</span>
+    <span class="py-meta">_inherit</span> = [<span class="py-st">'mail.thread'</span>, <span class="py-st">'mail.alias.mixin'</span>]
+    <span class="py-param">alias_id</span> = <span class="py-cn">fields</span>.<span class="py-fn">Many2one</span>(<span class="py-st">'mail.alias'</span>, <span class="py-st">'Alias'</span>, <span class="py-param">ondelete</span>=<span class="py-st">"restrict"</span>, <span class="py-param">required</span>=<span class="py-kw">True</span>, <span class="py-param">copy</span>=<span class="py-kw">False</span>)
+
+    <span class="py-kw">def</span> <span class="py-fn">_get_alias_model_name</span>(<span class="py-kw">self</span>, <span class="py-param">vals</span>): <span class="py-kw">return</span> <span class="py-st">'project.task'</span>
+    <span class="py-kw">def</span> <span class="py-fn">_get_alias_values</span>(<span class="py-kw">self</span>):
+        <span class="py-param">vals</span> = <span class="py-kw">super</span>().<span class="py-fn">_get_alias_values</span>()
+        <span class="py-param">vals</span>[<span class="py-st">'alias_defaults'</span>] = {<span class="py-st">'project_id'</span>: <span class="py-kw">self</span>.<span class="py-param">id</span>}
+        <span class="py-kw">return</span> <span class="py-param">vals</span></pre></div>
+        </section>
+
+        <section class="section-card cat-activities">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-tasks"></i></span>4. Activities Tracking (<code class="mixin-name-text">mail.activity.mixin</code>)</h2>
+            <p class="description-text">
+                Adds activity management (to-dos, calls, meetings) to records. Activities are <code class="field-name-text">mail.activity</code> records.
+            </p>
+            <h3 class="sub-section-title">Key Setup</h3>
+            <ul class="list-item">
+                <li><strong>Inherit:</strong> Add <code class="mixin-name-text">mail.activity.mixin</code> to your Python model.</li>
+                <li><strong>XML View:</strong> Add <code class="field-name-text">&lt;field name="activity_ids" widget="mail_activity"/&gt;</code> to the form view (usually in chatter).</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-website">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-globe-americas"></i></span>5. Website Features</h2>
+            <h3 class="sub-section-title">Visitor Tracking (<code class="mixin-name-text">utm.mixin</code>)</h3>
+            <p class="description-text">
+                Tracks marketing sources via UTM parameters. Adds <code class="field-name-text">campaign_id</code>, <code class="field-name-text">source_id</code>, <code class="field-name-text">medium_id</code> fields.
+                Extend by overriding <code class="method-name-text">tracking_fields()</code> for custom UTMs.
+            </p>
+
+            <h3 class="sub-section-title">Website Visibility (<code class="mixin-name-text">website.published.mixin</code>)</h3>
+            <p class="description-text">
+                Adds publish/unpublish toggle for website content. Adds <code class="field-name-text">website_published</code> (Boolean) field.
+            </p>
+            <div class="important-note">You <strong>must implement</strong> <code class="method-name-text">_compute_website_url(self)</code> to return the record's public URL.</div>
+             <p class="description-text">
+                Use <code class="field-name-text">&lt;field name="website_published" widget="website_button"/&gt;</code> in backend and <code class="field-name-text">&lt;t t-call="website.publish_management"&gt;</code> in frontend.
+            </p>
+
+            <h3 class="sub-section-title">Website SEO Metadata (<code class="mixin-name-text">website.seo.metadata</code>)</h3>
+            <p class="description-text">
+                Adds SEO fields: <code class="field-name-text">website_meta_title</code>, <code class="field-name-text">website_meta_description</code>, <code class="field-name-text">website_meta_keywords</code>.
+                Editable via website's "Promote" tool.
+            </p>
+        </section>
+
+        <section class="section-card cat-rating">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-star-half-alt"></i></span>6. Customer Rating (<code class="mixin-name-text">rating.mixin</code>)</h2>
+            <p class="description-text">
+                Enables collecting customer feedback via rating request emails.
+            </p>
+            <h3 class="sub-section-title">Key Setup & Methods</h3>
+            <ul class="list-item space-y-1">
+                <li><strong>Inherit:</strong> Add <code class="mixin-name-text">rating.mixin</code>. Model usually needs a <code class="field-name-text">partner_id</code> (customer).</li>
+                <li><code class="method-name-text">rating_get_partner_id()</code>: Override if customer field is not <code class="field-name-text">partner_id</code>.</li>
+                <li><code class="method-name-text">rating_get_access_token()</code>: Generates token for rating links used in email templates.</li>
+                <li><strong>Email Template:</strong> Create a <code class="field-name-text">mail.template</code> with links like <code class="field-name-text">/rate/${access_token}/RATING_VALUE</code> (e.g., /5, /3, /1).</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Use Odoo mixins to efficiently add powerful features to your applications.
+    </footer>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo QWeb Templates: Visual Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Base body styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* Lighter gray background */
+            color: #111827; /* Darker text for better contrast */
+            padding: 2rem; /* Default padding for larger screens */
+            box-sizing: border-box; /* Ensures padding doesn't add to width/height */
+        }
+        html, body {
+            min-height: 100%; /* Ensure body can fill viewport height */
+        }
+        .main-title {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #1f2937; /* Dark gray */
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563; /* Medium gray */
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* 12px */
+            padding: 2rem; /* 32px */
+            margin-bottom: 2rem; /* 32px */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-left-width: 6px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 600;
+            margin-bottom: 1.25rem; /* 20px */
+            display: flex;
+            align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.75rem; /* 12px */
+            font-size: 1.375rem; /* 22px */
+            width: 30px; /* Fixed width for alignment */
+            text-align: center;
+        }
+        .directive-name-text { /* For use in descriptive text, not code blocks */
+            font-family: 'Source Code Pro', monospace;
+            background-color: #eef2ff; 
+            color: #4338ca; 
+            padding: 0.125rem 0.375rem; 
+            border-radius: 0.25rem; 
+            font-weight: 600;
+            word-break: break-all;
+        }
+        .description-text {
+            font-size: 0.95rem; /* 15px */
+            color: #374151; /* Darker medium gray */
+            line-height: 1.6;
+            margin-bottom: 1rem; /* 16px */
+        }
+        .code-block {
+            background-color: #282c34; /* VS Code Dark+ like background */
+            color: #abb2bf; /* Default text color in Dark+ */
+            padding: 1.25rem; 
+            border-radius: 0.5rem; 
+            overflow-x: auto; 
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.9rem; 
+            margin-top: 0.75rem; 
+            margin-bottom: 1rem; 
+            -webkit-overflow-scrolling: touch; 
+            line-height: 1.5;
+        }
+        .code-block pre {
+            margin: 0;
+            white-space: pre; 
+        }
+        /* VS Code Inspired Syntax Highlighting */
+        .code-block .cmt { color: #5c6370; font-style: italic; } /* Comments */
+        .code-block .tag { color: #e06c75; } /* Tags like <p>, <div> */
+        .code-block .qweb-tag { color: #e06c75; font-weight: 500; } /* Specifically <t> */
+        .code-block .attr-name { color: #d19a66; } /* Attribute names like class, id */
+        .code-block .qweb-dir { color: #c678dd; font-weight: 500;} /* QWeb directives t-if, t-out */
+        .code-block .attr-val { color: #98c379; } /* Attribute values (strings) */
+        .code-block .expr { color: #61afef; } /* Expressions within directives */
+        .code-block .js-kw { color: #c678dd; } /* JavaScript keywords */
+        .code-block .py-kw { color: #c678dd; } /* Python keywords (conceptual) */
+        .code-block .op { color: #56b6c2; } /* Operators */
+
+
+        .important-note {
+            background-color: #fef3c7; 
+            border-left: 4px solid #f59e0b; 
+            padding: 0.75rem 1rem; 
+            margin: 1rem 0;
+            border-radius: 0.375rem; 
+            color: #92400e; 
+            font-size: 0.9rem;
+        }
+        .important-note strong {
+            color: #78350f; 
+        }
+        .sub-section-title {
+            font-size: 1.125rem; 
+            font-weight: 600;
+            color: #1e40af; 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.75rem; 
+        }
+        .list-item {
+            margin-bottom: 0.5rem; 
+            font-size: 0.9rem;
+        }
+        .list-item .directive-name-text { /* For use in list items */
+            font-size: 0.85rem;
+        }
+        .deprecated {
+            color: #ef4444; 
+            font-weight: 500;
+        }
+
+        /* Category Colors */
+        .cat-fundamentals { border-left-color: #3b82f6; } /* Blue */
+        .cat-fundamentals .section-title { color: #2563eb; }
+        .cat-display { border-left-color: #10b981; } /* Green */
+        .cat-display .section-title { color: #059669; }
+        .cat-control-flow { border-left-color: #f59e0b; } /* Amber */
+        .cat-control-flow .section-title { color: #d97706; }
+        .cat-vars-structure { border-left-color: #8b5cf6; } /* Violet */
+        .cat-vars-structure .section-title { color: #7c3aed; }
+        .cat-clientside { border-left-color: #ec4899; } /* Pink */
+        .cat-clientside .section-title { color: #db2777; }
+        .cat-perf-debug { border-left-color: #6366f1; } /* Indigo */
+        .cat-perf-debug .section-title { color: #4f46e5; }
+        .cat-platform-api { border-left-color: #0ea5e9; } /* Sky Blue */
+        .cat-platform-api .section-title { color: #0284c7; }
+        
+
+        /* Enhanced Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem; 
+                -webkit-text-size-adjust: 100%; 
+                text-size-adjust: 100%; 
+            }
+            .main-title {
+                font-size: 1.75rem; 
+                margin-bottom: 0.75rem;
+            }
+            .subtitle {
+                font-size: 0.9rem; 
+                margin-bottom: 2rem;
+            }
+            .section-card {
+                padding: 1.25rem; 
+                margin-bottom: 1.5rem; 
+            }
+            .section-title {
+                font-size: 1.25rem; 
+                margin-bottom: 1rem;
+            }
+            .section-title .icon {
+                font-size: 1.2rem; 
+                margin-right: 0.5rem;
+            }
+            .description-text {
+                font-size: 0.9rem; 
+                line-height: 1.55;
+            }
+            .sub-section-title {
+                font-size: 1.05rem; 
+            }
+            .code-block {
+                font-size: 0.825rem; 
+                padding: 0.75rem;
+            }
+            .important-note {
+                font-size: 0.85rem;
+                padding: 0.6rem 0.8rem;
+            }
+            .list-item {
+                font-size: 0.85rem;
+            }
+        }
+        @media (max-width: 480px) { /* Even smaller screens */
+            .main-title {
+                font-size: 1.5rem;
+            }
+            .section-title {
+                font-size: 1.1rem;
+            }
+             .description-text {
+                font-size: 0.875rem;
+            }
+            .sub-section-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo QWeb Templates: Visual Guide</h1>
+        <p class="subtitle">An XML-based templating engine for dynamic HTML generation in Odoo.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-fundamentals">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-layer-group"></i></span>1. QWeb Fundamentals</h2>
+            <p class="description-text">
+                QWeb is Odoo's primary XML-based templating engine, used mostly to generate HTML fragments and pages.
+                Directives are XML attributes prefixed with <code class="directive-name-text">t-</code>.
+            </p>
+            <h3 class="sub-section-title">The <code class="directive-name-text">&lt;t&gt;</code> Placeholder Element</h3>
+            <p class="description-text">
+                The <code class="directive-name-text">&lt;t&gt;</code> element executes its directive but doesn't render itself, useful for logic without adding extra HTML tags.
+            </p>
+            <div class="code-block"><pre><span class="cmt">&lt;!-- Example 1: &lt;t&gt; as placeholder --&gt;</span>
+&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-if</span>="<span class="expr">condition</span>"&gt;
+    &lt;<span class="tag">p</span>&gt;Content&lt;/<span class="tag">p</span>&gt;
+&lt;/<span class="qweb-tag">t</span>&gt;
+<span class="cmt">&lt;!-- Renders as: &lt;p&gt;Content&lt;/p&gt; (if condition is true) --&gt;</span>
+
+<span class="cmt">&lt;!-- Example 2: Directive on a standard HTML element --&gt;</span>
+&lt;<span class="tag">div</span> <span class="qweb-dir">t-if</span>="<span class="expr">condition</span>"&gt;
+    &lt;<span class="tag">p</span>&gt;Content&lt;/<span class="tag">p</span>&gt;
+&lt;/<span class="tag">div</span>&gt;
+<span class="cmt">&lt;!-- Renders as: &lt;div&gt;&lt;p&gt;Content&lt;/p&gt;&lt;/div&gt; (if condition is true) --&gt;</span></pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-display">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-print"></i></span>2. Displaying Data & Output</h2>
+
+            <h3 class="sub-section-title">Basic Output (<code class="directive-name-text">t-out</code>)</h3>
+            <p class="description-text">
+                Evaluates an expression and injects the result into the HTML.
+            </p>
+            <div class="important-note">
+                <strong>Security First:</strong> <code class="directive-name-text">t-out</code> automatically HTML-escapes its input, preventing XSS vulnerabilities.
+            </div>
+            <div class="code-block"><pre>&lt;<span class="tag">p</span>&gt;User: &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">user.name</span>"/&gt;&lt;/<span class="tag">p</span>&gt;
+<span class="cmt">&lt;!-- If user.name is "John &amp; Doe", renders as: &lt;p&gt;User: John &amp;amp; Doe&lt;/p&gt; --&gt;</span></pre>
+            </div>
+
+            <h3 class="sub-section-title">Field-Specific Output (<code class="directive-name-text">t-field</code>)</h3>
+            <p class="description-text">
+                Used for Odoo "smart records" (from <code class="directive-name-text">browse()</code>). Formats based on field type and integrates with website rich text editing. Use <code class="directive-name-text">t-options</code> for customization (e.g., widgets).
+            </p>
+            <div class="code-block"><pre>&lt;<span class="tag">span</span> <span class="qweb-dir">t-field</span>="<span class="expr">record.name</span>"/&gt;
+&lt;<span class="tag">div</span> <span class="qweb-dir">t-field</span>="<span class="expr">record.description_html</span>" <span class="qweb-dir">t-options-widget</span>="<span class="attr-val">'html'</span>"/&gt;
+&lt;<span class="tag">img</span> <span class="qweb-dir">t-field</span>="<span class="expr">record.image_1920</span>" <span class="qweb-dir">t-options-widget</span>="<span class="attr-val">'image'</span>" <span class="qweb-dir">t-options-alt-field</span>="<span class="attr-val">'name'</span>"/&gt;</pre>
+            </div>
+
+            <h3 class="sub-section-title">Dynamic Attributes</h3>
+            <p class="description-text">Compute and set HTML attributes dynamically.</p>
+            <ul class="list-item space-y-1">
+                <li><code class="directive-name-text">t-att-$name="expression"</code>: Sets attribute <code class="directive-name-text">$name</code>.
+                    <div class="code-block"><pre>&lt;<span class="tag">div</span> <span class="qweb-dir">t-att-id</span>="<span class="expr">product.id</span>"/&gt; <span class="cmt">&lt;!-- e.g., &lt;div id="123"&gt;&lt;/div&gt; --&gt;</span></pre></div>
+                </li>
+                <li><code class="directive-name-text">t-attf-$name="format_string {{expression}}"</code>: Format string for mixed content.
+                    <div class="code-block"><pre>&lt;<span class="tag">div</span> <span class="qweb-dir">t-attf-class</span>="<span class="attr-val">item {{</span> <span class="expr">product.type_class</span> <span class="attr-val">}} product-{{</span><span class="expr">product.id</span><span class="attr-val">}}</span>"/&gt;</pre></div>
+                </li>
+                <li><code class="directive-name-text">t-att="mapping"</code>: Dictionary to attributes.
+                    <div class="code-block"><pre>&lt;<span class="tag">div</span> <span class="qweb-dir">t-att</span>="<span class="expr">{'data-id': product.id, 'class': 'highlight'}</span>"/&gt;</pre></div>
+                </li>
+                <li><code class="directive-name-text">t-att="pair"</code>: List/tuple <code class="directive-name-text">[name, value]</code> to attribute.
+                    <div class="code-block"><pre>&lt;<span class="tag">div</span> <span class="qweb-dir">t-att</span>="<span class="expr">['data-record-id', product.id]</span>"/&gt;</pre></div>
+                </li>
+            </ul>
+
+            <h3 class="sub-section-title">Advanced Output & Security (Raw HTML)</h3>
+            <p class="description-text">
+                To output raw HTML (use with extreme caution!), the value should be an instance of <code class="directive-name-text">markupsafe.Markup</code> in Python.
+                The <code class="directive-name-text">t-raw</code> directive is <span class="deprecated">deprecated</span>; use <code class="directive-name-text">t-out</code> with a <code class="directive-name-text">Markup</code> object instead.
+            </p>
+        </section>
+
+        <section class="section-card cat-control-flow">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-code-branch"></i></span>3. Control Flow</h2>
+            <h3 class="sub-section-title">Conditionals (<code class="directive-name-text">t-if</code>, <code class="directive-name-text">t-elif</code>, <code class="directive-name-text">t-else</code>)</h3>
+            <p class="description-text">Render elements based on expression evaluation.</p>
+            <div class="code-block"><pre>&lt;<span class="tag">p</span> <span class="qweb-dir">t-if</span>="<span class="expr">user.is_admin</span>"&gt;Welcome Admin!&lt;/<span class="tag">p</span>&gt;
+&lt;<span class="tag">p</span> <span class="qweb-dir">t-elif</span>="<span class="expr">user.is_member</span>"&gt;Welcome Member!&lt;/<span class="tag">p</span>&gt;
+&lt;<span class="tag">p</span> <span class="qweb-dir">t-else</span>=""&gt;Welcome Guest!&lt;/<span class="tag">p</span>&gt;</pre>
+            </div>
+
+            <h3 class="sub-section-title">Loops (<code class="directive-name-text">t-foreach</code>, <code class="directive-name-text">t-as</code>)</h3>
+            <p class="description-text">Iterates over collections. <code class="directive-name-text">t-as</code> defines the current item variable.</p>
+            <div class="code-block"><pre>&lt;<span class="tag">ul</span>&gt;
+    &lt;<span class="tag">li</span> <span class="qweb-dir">t-foreach</span>="<span class="expr">products</span>" <span class="qweb-dir">t-as</span>="<span class="expr">product</span>"&gt;
+        &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">product.name</span>"/&gt; - Price: &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">product.price</span>"/&gt;
+    &lt;/<span class="tag">li</span>&gt;
+&lt;/<span class="tag">ul</span>&gt;</pre>
+            </div>
+            <p class="description-text"><strong>Iteration Variables</strong> (if <code class="directive-name-text">t-as="item"</code>):
+                <code class="directive-name-text">item_value</code>, <code class="directive-name-text">item_index</code>,
+                <code class="directive-name-text">item_size</code>, <code class="directive-name-text">item_first</code>,
+                <code class="directive-name-text">item_last</code>.
+                (<span class="deprecated">Deprecated: `item_all`, `item_parity`, `item_even`, `item_odd`</span>)
+            </p>
+        </section>
+
+        <section class="section-card cat-vars-structure">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-cubes"></i></span>4. Variables & Template Organization</h2>
+            <h3 class="sub-section-title">Setting Variables (<code class="directive-name-text">t-set</code>, <code class="directive-name-text">t-value</code>)</h3>
+            <p class="description-text">Creates variables within the template scope.</p>
+            <ul class="list-item space-y-1">
+                <li><code class="directive-name-text">t-set="var_name" t-value="expression"</code>
+                    <div class="code-block"><pre>&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-set</span>="<span class="expr">item_count</span>" <span class="qweb-dir">t-value</span>="<span class="expr">len(order_lines)</span>"/&gt;
+&lt;<span class="tag">p</span>&gt;You have &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">item_count</span>"/&gt; items.&lt;/<span class="tag">p</span>&gt;</pre></div>
+                </li>
+                <li><code class="directive-name-text">t-set="var_name"</code> (with body content for HTML value)
+                    <div class="code-block"><pre>&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-set</span>="<span class="expr">user_greeting</span>"&gt;
+    &lt;<span class="tag">strong</span>&gt;Hello, &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">user.name</span>"/&gt;!&lt;/<span class="tag">strong</span>&gt;
+&lt;/<span class="qweb-tag">t</span>&gt;
+&lt;<span class="tag">div</span>&gt;&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">user_greeting</span>"/&gt;&lt;/<span class="tag">div</span>&gt;</pre></div>
+                </li>
+            </ul>
+
+            <h3 class="sub-section-title">Calling Sub-Templates (<code class="directive-name-text">t-call</code>)</h3>
+            <p class="description-text">Renders another QWeb template for reusability. Parent context is passed. Variables set in <code class="directive-name-text">t-call</code> body are local to the call. The rendered body of <code class="directive-name-text">t-call</code> is available as variable <code class="directive-name-text">0</code> in the sub-template.</p>
+            <div class="code-block"><pre><span class="cmt">&lt;!-- Main Template --&gt;</span>
+&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-call</span>="<span class="attr-val">my_module.wrapper_template</span>"&gt;
+    &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-set</span>="<span class="expr">title</span>" <span class="qweb-dir">t-value</span>="<span class="attr-val">'My Page Title'</span>"/&gt; <span class="cmt">&lt;!-- Local to sub-template --&gt;</span>
+    &lt;<span class="tag">em</span>&gt;This is dynamic content to be wrapped.&lt;/<span class="tag">em&gt; <span class="cmt">&lt;!-- This becomes '0' --&gt;</span>
+&lt;/<span class="qweb-tag">t</span>&gt;
+
+<span class="cmt">&lt;!-- Definition of my_module.wrapper_template --&gt;</span>
+&lt;<span class="tag">div</span> <span class="attr-name">class</span>="<span class="attr-val">card-wrapper</span>"&gt;
+    &lt;<span class="tag">h4</span>&gt;&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">title</span> <span class="op">or</span> <span class="attr-val">'Default Title'</span>"/&gt;&lt;/<span class="tag">h4</span>&gt;
+    &lt;<span class="tag">div</span> <span class="attr-name">class</span>="<span class="attr-val">card-body</span>"&gt;
+        &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">0</span>"/&gt; <span class="cmt">&lt;!-- Outputs the &lt;em&gt; tag and its content --&gt;</span>
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-clientside">
+            <h2 class="section-title"><span class="icon"><i class="fab fa-js-square"></i></span>5. Client-Side Templates & Inheritance (JS)</h2>
+            <h3 class="sub-section-title">Defining JS Templates (<code class="directive-name-text">t-name</code>)</h3>
+            <p class="description-text">Defines templates for client-side rendering (e.g., Kanban views, widgets).</p>
+            <div class="code-block"><pre>&lt;<span class="tag">templates</span>&gt;
+    &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-name</span>="<span class="attr-val">my_module.my_js_template</span>"&gt;
+        &lt;<span class="tag">div</span>&gt;Hello, &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">name</span>"/&gt;!&lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="qweb-tag">t</span>&gt;
+&lt;/<span class="tag">templates</span>&gt;</pre>
+            </div>
+
+            <h3 class="sub-section-title">Template Inheritance (Client-Side)</h3>
+            <p class="description-text">Modify or extend existing client-side templates.</p>
+            <ul class="list-item space-y-1">
+                <li><strong>Modern:</strong> <code class="directive-name-text">t-inherit</code>, <code class="directive-name-text">t-inherit-mode</code>, <code class="directive-name-text">&lt;xpath&gt;</code>.
+                    <ul class="list-disc pl-5">
+                        <li><code class="directive-name-text">t-inherit-mode="'primary'"</code> (new child) or <code class="directive-name-text">"'extension'"</code> (modify in-place).</li>
+                        <li>Changes via <code class="directive-name-text">&lt;xpath expr="//selector" position="operation"/&gt;</code>.</li>
+                    </ul>
+                </li>
+                <li><strong>Old/Deprecated:</strong> <code class="directive-name-text">t-extend</code>, <code class="directive-name-text">t-jquery</code>.</li>
+            </ul>
+            <div class="code-block"><pre><span class="cmt">&lt;!-- Modern Inheritance Example (Extension) --&gt;</span>
+&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-inherit</span>="<span class="attr-val">base_module.some_template</span>" <span class="qweb-dir">t-inherit-mode</span>="<span class="attr-val">'extension'</span>"&gt;
+    &lt;<span class="tag">xpath</span> <span class="attr-name">expr</span>="<span class="attr-val">//div[@class='target-div']</span>" <span class="attr-name">position</span>="<span class="attr-val">inside</span>"&gt;
+        &lt;<span class="tag">p</span>&gt;New content added here!&lt;/<span class="tag">p</span>&gt;
+    &lt;/<span class="tag">xpath</span>&gt;
+&lt;/<span class="qweb-tag">t</span>&gt;</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-perf-debug">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-tachometer-alt"></i></span>6. Performance & Debugging</h2>
+            <h3 class="sub-section-title">Rendering Cache (Python: <code class="directive-name-text">t-cache</code>, <code class="directive-name-text">t-nocache</code>)</h3>
+            <p class="description-text">Optimize server-side rendering by caching template parts.</p>
+            <ul class="list-item space-y-1">
+                <li><code class="directive-name-text">t-cache="key_expression"</code>: Caches output. Key (e.g., <code class="directive-name-text">record.id, record.write_date</code>) determines cache validity. Falsy key = no cache.</li>
+                <li><code class="directive-name-text">t-nocache="doc_string"</code>: Part not cached, even within <code class="directive-name-text">t-cache</code>. Uses controller-provided values.</li>
+                <li><code class="directive-name-text">t-nocache-$var="expr"</code>: Caches primitive <code class="directive-name-text">expr</code> result for use in <code class="directive-name-text">t-nocache</code> block.</li>
+            </ul>
+            <div class="code-block"><pre>&lt;<span class="tag">div</span> <span class="qweb-dir">t-cache</span>="<span class="expr">product, product.write_date</span>"&gt;
+    &lt;<span class="tag">h3</span>&gt;&lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">product.name</span>"/&gt;&lt;/<span class="tag">h3</span>&gt;
+    &lt;<span class="tag">span</span> <span class="qweb-dir">t-nocache</span>=""&gt;Viewed: &lt;<span class="qweb-tag">t</span> <span class="qweb-dir">t-out</span>="<span class="expr">view_counter</span>"/&gt; times&lt;/<span class="tag">span</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</pre></div>
+            <div class="important-note"><strong>Scope Warning:</strong> <code class="directive-name-text">t-set</code> inside <code class="directive-name-text">t-cache</code> is scoped; won't affect outside if cache hits.</div>
+
+            <h3 class="sub-section-title">Debugging Tools</h3>
+            <ul class="list-item space-y-1">
+                <li><strong>Python:</strong> <code class="directive-name-text">t-debug=""</code> invokes <code class="directive-name-text">pdb</code>.</li>
+                <li><strong>JavaScript:</strong>
+                    <ul class="list-disc pl-5">
+                        <li><code class="directive-name-text">t-log="expression"</code>: <code class="directive-name-text">console.log(expression)</code>.</li>
+                        <li><code class="directive-name-text">t-debug=""</code>: Triggers JS debugger.</li>
+                        <li><code class="directive-name-text">t-js="ctx_name"</code>: Executes body as JS; context in <code class="directive-name-text">ctx_name</code>.</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-platform-api">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-cogs"></i></span>7. Platform Helpers & API</h2>
+            <h3 class="sub-section-title">Python (Server-Side)</h3>
+            <ul class="list-item space-y-1">
+                <li><code class="directive-name-text">odoo.http.HttpRequest.render('tpl_name', values)</code>: In controllers.</li>
+                <li><code class="directive-name-text">env['ir.qweb']._render('tpl_id_or_xmlid', values)</code>: Lower-level.</li>
+            </ul>
+            <h3 class="sub-section-title">JavaScript (Client-Side)</h3>
+            <ul class="list-item space-y-1">
+                <li><code class="directive-name-text">core.qweb</code> (instance of <code class="directive-name-text">QWeb2.Engine()</code> via <code class="directive-name-text">require('web.core').qweb</code>).
+                    <ul class="list-disc pl-5">
+                        <li><code class="directive-name-text">core.qweb.render('tpl_name', context)</code>.</li>
+                        <li><code class="directive-name-text">core.qweb.add_template(templates)</code>.</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        QWeb is a powerful tool for dynamic UI in Odoo. Understanding its directives is key to effective Odoo development.
+    </footer>
+
+</body>
+</html>

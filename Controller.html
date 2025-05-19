@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Web Controllers: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .method-name-text {
+            font-family: 'Source Code Pro', monospace; background-color: #e0e7ff;
+            color: #3730a3; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text { /* For params, attributes in text */
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-decorator { color: #61afef; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-num { color: #d19a66; } 
+        .code-block .py-param { color: #abb2bf; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;} 
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .danger-note {
+            background-color: #fee2e2; border-left: 4px solid #ef4444;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #991b1b; font-size: 0.85rem;
+        }
+        .danger-note strong { color: #7f1d1d; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .method-name-text, .list-item .field-name-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-ctrl-intro { border-left-color: #6b7280; } .cat-ctrl-intro .section-title { color: #4b5563; }
+        .cat-ctrl-routing { border-left-color: #8b5cf6; } .cat-ctrl-routing .section-title { color: #7c3aed; } /* Violet */
+        .cat-ctrl-request { border-left-color: #0ea5e9; } .cat-ctrl-request .section-title { color: #0284c7; } /* Sky Blue */
+        .cat-ctrl-response { border-left-color: #10b981; } .cat-ctrl-response .section-title { color: #059669; } /* Green */
+        .cat-ctrl-dispatch { border-left-color: #f59e0b; } .cat-ctrl-dispatch .section-title { color: #d97706; } /* Amber */
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .danger-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Web Controllers: Cheatsheet</h1>
+        <p class="subtitle">Guide to creating HTTP endpoints and handling web requests in Odoo.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-ctrl-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-network-wired"></i></span>1. Introduction to Controllers</h2>
+            <p class="description-text">
+                Odoo Controllers handle web requests and define HTTP endpoints. They are Python classes inheriting from <code class="concept-text">odoo.http.Controller</code>.
+                Controllers have their own extension mechanism, separate from Models, allowing them to be overridden even if a database isn't fully available.
+            </p>
+            <h3 class="sub-section-title">Basic Controller Structure</h3>
+            <div class="code-block"><pre><span class="py-kw">import</span> odoo.http
+<span class="py-kw">from</span> odoo.http <span class="py-kw">import</span> route, request
+
+<span class="py-kw">class</span> <span class="py-cn">MyWebsiteController</span>(odoo.http.<span class="py-cn">Controller</span>):
+
+    <span class="py-decorator">@route</span>(<span class="py-st">'/my_page'</span>, <span class="py-param">type</span>=<span class="py-st">'http'</span>, <span class="py-param">auth</span>=<span class="py-st">'public'</span>, <span class="py-param">website</span>=<span class="py-kw">True</span>)
+    <span class="py-kw">def</span> <span class="py-fn">my_page_handler</span>(<span class="py-kw">self</span>, **<span class="py-param">kwargs</span>):
+        <span class="cmt"># kwargs will contain URL parameters</span>
+        <span class="py-kw">return</span> request.<span class="py-fn">render</span>(<span class="py-st">'my_module.my_page_template'</span>, {<span class="py-st">'name'</span>: <span class="py-st">'Odoo User'</span>})</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-ctrl-routing">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-route"></i></span>2. Routing with <code class="method-name-text">@route</code></h2>
+            <p class="description-text">
+                The <code class="method-name-text">@odoo.http.route()</code> decorator maps URL paths to controller methods.
+            </p>
+            <h3 class="sub-section-title">Key <code class="method-name-text">@route</code> Parameters:</h3>
+            <ul class="list-item space-y-1">
+                <li><code class="field-name-text">route</code>: (String or List of Strings) URL path(s) for the endpoint (e.g., <code class="py-st">'/my_url'</code>, <code class="py-st">'/page/&lt;model("res.partner"):partner&gt;'</code>). Supports Werkzeug routing syntax.</li>
+                <li><code class="field-name-text">type</code>: Request type:
+                    <ul class="list-disc pl-5 mt-1">
+                        <li><code class="py-st">'http'</code>: Standard HTTP request, returns HTML or other HTTP responses.</li>
+                        <li><code class="py-st">'json'</code>: For JSON-RPC requests, expects JSON data, returns JSON.</li>
+                    </ul>
+                </li>
+                <li><code class="field-name-text">auth</code>: Authentication method:
+                    <ul class="list-disc pl-5 mt-1">
+                        <li><code class="py-st">'user'</code>: Requires authenticated user. Uses user's rights.</li>
+                        <li><code class="py-st">'bearer'</code>: Authenticates via "Authorization: Bearer &lt;token&gt;" header or session.</li>
+                        <li><code class="py-st">'public'</code>: User may or may not be authenticated. Uses public user rights if not logged in.</li>
+                        <li><code class="py-st">'none'</code>: Always active, even without a database (for framework/auth routes). No user context.</li>
+                    </ul>
+                </li>
+                <li><code class="field-name-text">methods</code>: List of allowed HTTP methods (e.g., <code class="py-st">['GET', 'POST']</code>). Defaults to all.</li>
+                <li><code class="field-name-text">cors</code>: Value for <code class="field-name-text">Access-Control-Allow-Origin</code> CORS header (e.g., <code class="py-st">'*'</code>).</li>
+                <li><code class="field-name-text">csrf</code>: (Boolean) Enable/disable CSRF protection. Default: True for 'http', False for 'json'.</li>
+                <li><code class="field-name-text">website</code>: (Boolean, if <code class="concept-text">website</code> module is installed) If True, makes website-specific features available (e.g., layout rendering).</li>
+                <li><code class="field-name-text">sitemap</code>: (Boolean or Callable, if <code class="concept-text">website</code> module is installed) Control sitemap generation.</li>
+            </ul>
+
+            <h3 class="sub-section-title">Controller Extension & Overriding Routes</h3>
+            <p class="description-text">
+                To override an existing controller, inherit from its class and redefine methods.
+            </p>
+            <div class="important-note">
+                <strong>Mandatory Re-decoration:</strong> When overriding a routed method, you <strong>must</strong> re-apply the <code class="method-name-text">@route()</code> decorator (even with no arguments) to keep the route published.
+                Providing arguments to the new <code class="method-name-text">@route()</code> decorator will override the original route's parameters (e.g., changing <code class="field-name-text">auth</code>).
+            </div>
+            <div class="code-block"><pre><span class="py-kw">class</span> <span class="py-cn">ExistingController</span>(odoo.http.<span class="py-cn">Controller</span>):
+    <span class="py-decorator">@route</span>(<span class="py-st">'/original_url'</span>, <span class="py-param">auth</span>=<span class="py-st">'public'</span>)
+    <span class="py-kw">def</span> <span class="py-fn">original_handler</span>(<span class="py-kw">self</span>):
+        <span class="py-kw">return</span> <span class="py-st">"Original Content"</span>
+
+<span class="py-kw">class</span> <span class="py-cn">MyExtension</span>(<span class="py-cn">ExistingController</span>):
+    <span class="py-decorator">@route</span>() <span class="cmt"># Keeps '/original_url', auth='public' by default</span>
+    <span class="py-kw">def</span> <span class="py-fn">original_handler</span>(<span class="py-kw">self</span>):
+        <span class="py-param">original_response</span> = <span class="py-kw">super</span>().<span class="py-fn">original_handler</span>()
+        <span class="py-kw">return</span> <span class="py-st">"Extended: "</span> + <span class="py-param">original_response</span>
+
+<span class="py-kw">class</span> <span class="py-cn">AuthOverride</span>(<span class="py-cn">ExistingController</span>):
+    <span class="py-decorator">@route</span>(<span class="py-param">auth</span>=<span class="py-st">'user'</span>) <span class="cmt"># Overrides auth for '/original_url' to 'user'</span>
+    <span class="py-kw">def</span> <span class="py-fn">original_handler</span>(<span class="py-kw">self</span>):
+        <span class="py-kw">return</span> <span class="py-kw">super</span>().<span class="py-fn">original_handler</span>()</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-ctrl-request">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-sign-in-alt"></i></span>3. The Request Object (<code class="concept-text">odoo.http.request</code>)</h2>
+            <p class="description-text">
+                Available as <code class="method-name-text">odoo.http.request</code> (or just <code class="method-name-text">request</code> after importing) within controller methods. Wraps the incoming HTTP request.
+            </p>
+            <h3 class="sub-section-title">Key Attributes & Methods:</h3>
+            <ul class="list-item space-y-1">
+                <li><code class="field-name-text">env</code>: The Odoo environment associated with the request (e.g., <code class="method-name-text">request.env['res.partner']</code>).</li>
+                <li><code class="field-name-text">session</code>: Session object (e.g., <code class="method-name-text">request.session.uid</code> for user ID).</li>
+                <li><code class="field-name-text">httprequest</code>: Underlying Werkzeug request object. Contains headers, method, etc. (e.g., <code class="method-name-text">request.httprequest.method</code>, <code class="method-name-text">request.httprequest.headers</code>).</li>
+                <li><code class="field-name-text">params</code>: A dictionary of combined GET and POST parameters (available after dispatch).</li>
+                <li><code class="method-name-text">update_env(user, context, su)</code>: Updates the request's environment (user, context, superuser mode).</li>
+                <li><code class="method-name-text">update_context(**overrides)</code>: Overrides specific keys in the current request context.</li>
+                <li><code class="method-name-text">csrf_token()</code>: Generates a CSRF token for the current session.</li>
+                <li><code class="method-name-text">validate_csrf(token)</code>: Validates a given CSRF token.</li>
+                <li><code class="method-name-text">get_http_params()</code>: Extracts key-value pairs from query string and form data.</li>
+                <li><code class="method-name-text">render(template_xmlid, qcontext=None, lazy=True)</code>: Renders a QWeb template. <code class="field-name-text">qcontext</code> is the dictionary of values for the template.</li>
+                <li><code class="method-name-text">reroute(path)</code>: Internally rewrites the request URL; does not send a 3xx redirect to the browser.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-ctrl-response">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-sign-out-alt"></i></span>4. Generating Responses</h2>
+            <p class="description-text">
+                Controller methods return values that are converted into HTTP responses.
+            </p>
+            <h3 class="sub-section-title">Common Ways to Return Responses:</h3>
+            <ul class="list-item space-y-1">
+                <li><strong>String:</strong> Returning a string directly is treated as HTML content with a 200 OK status.
+                    <div class="code-block"><pre><span class="py-kw">return</span> <span class="py-st">"&lt;html&gt;&lt;body&gt;Hello World&lt;/body&gt;&lt;/html&gt;"</span></pre></div>
+                </li>
+                <li><code class="method-name-text">request.render(template, qcontext)</code>: Renders a QWeb template and returns it as an HTML response. This is the most common way for website pages.
+                    <div class="code-block"><pre><span class="py-kw">return</span> request.<span class="py-fn">render</span>(<span class="py-st">'my_module.my_template'</span>, {<span class="py-st">'message'</span>: <span class="py-st">'Success!'</span>})</pre></div>
+                </li>
+                <li><code class="method-name-text">request.make_response(data, headers=None, cookies=None, status=200)</code>: For non-HTML responses or when custom headers/cookies are needed.
+                    <div class="code-block"><pre><span class="py-kw">return</span> request.<span class="py-fn">make_response</span>(<span class="py-st">"Plain text data"</span>, <span class="py-param">headers</span>=[(<span class="py-st">'Content-Type'</span>, <span class="py-st">'text/plain'</span>)])</pre></div>
+                </li>
+                <li><code class="method-name-text">request.make_json_response(data, headers=None, cookies=None, status=200)</code>: For JSON responses. Automatically serializes <code class="field-name-text">data</code> to JSON and sets <code class="field-name-text">Content-Type: application/json</code>.
+                    <div class="code-block"><pre><span class="py-kw">return</span> request.<span class="py-fn">make_json_response</span>({<span class="py-st">'status'</span>: <span class="py-st">'ok'</span>, <span class="py-st">'data'</span>: [<span class="py-num">1</span>,<span class="py-num">2</span>,<span class="py-num">3</span>]})</pre></div>
+                </li>
+                <li><code class="method-name-text">request.not_found(description=None)</code>: Returns a standard HTTP 404 Not Found response.</li>
+                <li><strong>Redirects:</strong> Use <code class="method-name-text">odoo.http.redirect_with_hash(url)</code> or create a Werkzeug redirect response.
+                    <div class="code-block"><pre><span class="py-kw">from</span> werkzeug.utils <span class="py-kw">import</span> redirect
+<span class="py-kw">return</span> <span class="py-fn">redirect</span>(<span class="py-st">'/another/page'</span>, <span class="py-num">303</span>)</pre></div>
+                </li>
+            </ul>
+            <p class="description-text">
+                The <code class="concept-text">odoo.http.Response</code> class (subclass of <code class="concept-text">werkzeug.wrappers.Response</code>) can also be instantiated and returned directly for full control. It supports QWeb lazy rendering parameters like <code class="field-name-text">template</code> and <code class="field-name-text">qcontext</code>.
+            </p>
+        </section>
+
+        <section class="section-card cat-ctrl-dispatch">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-exchange-alt"></i></span>5. Request Dispatchers</h2>
+            <p class="description-text">
+                Dispatchers handle the actual processing of requests based on their type.
+            </p>
+            <ul class="list-item space-y-1">
+                <li><code class="concept-text">HttpDispatcher</code>: Handles <code class="field-name-text">type='http'</code> requests. Deserializes request body/query string, checks CORS/CSRF.</li>
+                <li><code class="concept-text">JsonRPCDispatcher</code>: Handles <code class="field-name-text">type='json'</code> requests according to JSON-RPC 2.0 (with minor Odoo-specific variations). Expects <code class="field-name-text">params</code> to be a JSON object. Allows passing a <code class="field-name-text">context</code> argument in the JSON payload to override session context.</li>
+            </ul>
+            <p class="description-text">
+                Both dispatchers have <code class="method-name-text">handle_error(exc)</code> methods for custom error handling.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Master Odoo web controllers to build powerful custom web interfaces and APIs.
+    </footer>
+</body>
+</html>

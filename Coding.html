@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Coding Guidelines: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .file-name-text { /* For file/folder names in text */
+            font-family: 'Source Code Pro', monospace; background-color: #d1fae5; /* Light Green */
+            color: #065f46; /* Dark Green */ padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;} 
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .path { color: #61afef; } /* For paths in directory structure */
+        .code-block .dir { color: #e5c07b; } /* For directory names */
+        .code-block .file { color: #98c379; } /* For file names */
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; /* Orange */
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .field-name-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-guideline-intro { border-left-color: #6b7280; } .cat-guideline-intro .section-title { color: #4b5563; }
+        .cat-guideline-module-struct { border-left-color: #8b5cf6; } .cat-guideline-module-struct .section-title { color: #7c3aed; }
+        .cat-guideline-xml { border-left-color: #0ea5e9; } .cat-guideline-xml .section-title { color: #0284c7; }
+        .cat-guideline-python { border-left-color: #10b981; } .cat-guideline-python .section-title { color: #059669; }
+        .cat-guideline-js { border-left-color: #f59e0b; } .cat-guideline-js .section-title { color: #d97706; }
+        .cat-guideline-css { border-left-color: #ec4899; } .cat-guideline-css .section-title { color: #db2777; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Coding Guidelines: Cheatsheet</h1>
+        <p class="subtitle">Best practices for developing high-quality Odoo modules.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-guideline-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-ruler-combined"></i></span>1. Introduction</h2>
+            <p class="description-text">
+                Odoo coding guidelines aim to improve code quality, readability, maintainability, and reliability. Apply to new modules and new developments.
+            </p>
+            <div class="warning-note">
+                <strong>Stable Versions:</strong> When modifying existing files in stable versions, strictly follow the original file's style. Keep diffs minimal.
+                <br>
+                <strong>Master Version:</strong> Apply guidelines to existing code in `master` only for modified sections or if the file is undergoing major revision.
+            </div>
+        </section>
+
+        <section class="section-card cat-guideline-module-struct">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-folder-tree"></i></span>2. Module Structure & File Naming</h2>
+            <p class="description-text">
+                A well-organized module structure makes it easier to understand and navigate.
+            </p>
+            <h3 class="sub-section-title">Key Directories:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="file-name-text">data/</code>: XML files for master and demo data.</li>
+                <li><code class="file-name-text">models/</code>: Python files for model definitions.</li>
+                <li><code class="file-name-text">controllers/</code>: Python files for HTTP route controllers.</li>
+                <li><code class="file-name-text">views/</code>: XML files for views and QWeb templates.</li>
+                <li><code class="file-name-text">static/</code>: Web assets (CSS, JS, images, libraries). Subdivided into <code class="file-name-text">css/</code>, <code class="file-name-text">js/</code>, <code class="file-name-text">img/</code>, <code class="file-name-text">lib/</code>, <code class="file-name-text">src/</code>.</li>
+                <li><code class="file-name-text">wizard/</code> (Optional): Transient models and their views.</li>
+                <li><code class="file-name-text">report/</code> (Optional): Printable reports (QWeb templates, actions) and SQL view-based report models.</li>
+                <li><code class="file-name-text">tests/</code> (Optional): Python tests.</li>
+            </ul>
+
+            <h3 class="sub-section-title">File Naming Conventions:</h3>
+            <ul class="list-item space-y-1">
+                <li><strong>Models:</strong> Split by main model. File named after main model (e.g., <code class="file-name-text">plant_nursery.py</code>). Inherited models in separate files (e.g., <code class="file-name-text">res_partner.py</code>).</li>
+                <li><strong>Security:</strong>
+                    <ul class="list-disc pl-5 mt-1">
+                        <li>Access Rights: <code class="file-name-text">ir.model.access.csv</code>.</li>
+                        <li>Groups: <code class="file-name-text">&lt;module&gt;_groups.xml</code> (e.g., <code class="file-name-text">plant_nursery_groups.xml</code>).</li>
+                        <li>Record Rules: <code class="file-name-text">&lt;model&gt;_security.xml</code> (e.g., <code class="file-name-text">plant_nursery_security.xml</code>).</li>
+                    </ul>
+                </li>
+                <li><strong>Views (Backend):</strong> Split like models, suffixed with <code class="file-name-text">_views.xml</code> (e.g., <code class="file-name-text">plant_nursery_views.xml</code>). Menus can be in <code class="file-name-text">&lt;module&gt;_menus.xml</code>.</li>
+                <li><strong>Templates (Frontend/Portal):</strong> <code class="file-name-text">&lt;model&gt;_templates.xml</code> (e.g., <code class="file-name-text">plant_nursery_templates.xml</code>).</li>
+                <li><strong>Data:</strong> Split by purpose (data/demo) and model, suffixed with <code class="file-name-text">_data.xml</code> or <code class="file-name-text">_demo.xml</code> (e.g., <code class="file-name-text">plant_nursery_data.xml</code>).</li>
+                <li><strong>Controllers:</strong> Main controllers in <code class="file-name-text">&lt;module_name&gt;.py</code>. Inherited controllers in <code class="file-name-text">&lt;inherited_module_name&gt;.py</code> (e.g., <code class="file-name-text">portal.py</code>).</li>
+                <li><strong>Static Files (JS/SCSS/XML Templates):</strong> Meaningful names, often per component (e.g., <code class="file-name-text">activity.js</code>).</li>
+                <li><strong>Wizards:</strong> <code class="file-name-text">&lt;transient_model_name&gt;.py</code> and <code class="file-name-text">&lt;transient_model_name&gt;_views.xml</code> in <code class="file-name-text">wizard/</code>.</li>
+                <li><strong>Reports (Printable QWeb):</strong> Actions in <code class="file-name-text">&lt;model&gt;_reports.xml</code>, templates in <code class="file-name-text">&lt;model&gt;_templates.xml</code> within <code class="file-name-text">report/</code>.</li>
+            </ul>
+            <div class="important-note">File names: lowercase alphanumerics and underscores (<code class="field-name-text">[a-z0-9_]</code>). Permissions: folders 755, files 644.</div>
+        </section>
+
+        <section class="section-card cat-guideline-xml">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-code"></i></span>3. XML Files</h2>
+            <h3 class="sub-section-title">Formatting:</h3>
+            <ul class="list-item">
+                <li>Use <code class="field-name-text">&lt;record&gt;</code> tag. <code class="field-name-text">id</code> attribute first, then <code class="field-name-text">model</code>.</li>
+                <li>For <code class="field-name-text">&lt;field&gt;</code>: <code class="field-name-text">name</code> attribute first, then value (in tag body or <code class="field-name-text">eval</code>), then other attributes (widget, options) by importance.</li>
+                <li>Group records by model where possible.</li>
+                <li>Use <code class="field-name-text">&lt;data noupdate="1"&gt;</code> for non-updatable data. If all data in file is noupdate, set on <code class="field-name-text">&lt;odoo noupdate="1"&gt;</code>.</li>
+                <li>Prefer custom tags like <code class="field-name-text">&lt;menuitem&gt;</code> and <code class="field-name-text">&lt;template&gt;</code> over generic <code class="field-name-text">&lt;record&gt;</code> where appropriate.</li>
+            </ul>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"view_plant_nursery_form"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.ui.view"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;plant.nursery.view.form&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"model"</span>&gt;plant.nursery&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"arch"</span> <span class="xml-attr">type</span>=<span class="xml-val">"xml"</span>&gt;
+        <span class="cmt">&lt;!-- ... view architecture ... --&gt;</span>
+    &lt;/<span class="xml-tag">field</span>&gt;
+&lt;/<span class="xml-tag">record</span>&gt;</pre>
+            </div>
+
+            <h3 class="sub-section-title">XML IDs & Naming Conventions:</h3>
+            <ul class="list-item space-y-1">
+                <li><strong>Views:</strong> <code class="field-name-text">&lt;model_name&gt;_view_&lt;type&gt;</code> (e.g., <code class="field-name-text">plant_nursery_view_form</code>).</li>
+                <li><strong>Actions:</strong> Main action <code class="field-name-text">&lt;model_name&gt;_action</code>. Others suffixed (e.g., <code class="field-name-text">plant_nursery_action_open_orders</code>).</li>
+                <li><strong>Menus:</strong> <code class="field-name-text">&lt;model_name&gt;_menu</code> or <code class="field-name-text">&lt;model_name&gt;_menu_&lt;detail&gt;</code>.</li>
+                <li><strong>Groups:</strong> <code class="field-name-text">&lt;module_name&gt;_group_&lt;group_name&gt;</code> (e.g., <code class="field-name-text">plant_nursery_group_user</code>).</li>
+                <li><strong>Rules:</strong> <code class="field-name-text">&lt;model_name&gt;_rule_&lt;concerned_group&gt;</code> (e.g., <code class="field-name-text">plant_nursery_rule_user</code>).</li>
+                <li><strong>Naming:</strong> Record <code class="field-name-text">name</code> field often identical to XML ID, with dots replacing underscores. Actions should have user-friendly names.</li>
+            </ul>
+            <h3 class="sub-section-title">Inheriting XML:</h3>
+            <ul class="list-item">
+                <li>Inheriting view's XML ID: Use the *same ID* as the original record (Odoo prefixes with module name).</li>
+                <li>Inheriting view's <code class="field-name-text">name</code> field: Add <code class="field-name-text">.inherit.{details}</code> suffix (e.g., <code class="field-name-text">model.view.form.inherit.mymodule</code>).</li>
+                <li>New primary views (mode="primary") do not need the inherit suffix in their name.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-guideline-python">
+            <h2 class="section-title"><span class="icon"><i class="fab fa-python"></i></span>4. Python</h2>
+            <div class="warning-note">Also review "Security Pitfalls" (covered in the Odoo Security Cheatsheet).</div>
+            <h3 class="sub-section-title">PEP8 & Imports:</h3>
+            <ul class="list-item">
+                <li>Follow PEP8, but some rules can be ignored (e.g., E501 line too long, E301/E302 blank lines).</li>
+                <li>Import order: 1. External libs (stdlib first, then others), 2. <code class="field-name-text">odoo</code> imports, 3. Odoo addon imports (rare). Alphabetical within groups.</li>
+            </ul>
+            <div class="code-block"><pre><span class="cmt"># Correct Import Order Example</span>
+<span class="py-kw">import</span> logging
+<span class="py-kw">import</span> re
+
+<span class="py-kw">from</span> odoo <span class="py-kw">import</span> api, fields, models, _
+<span class="py-kw">from</span> odoo.exceptions <span class="py-kw">import</span> UserError
+
+<span class="py-kw">from</span> odoo.addons.http_routing.models.ir_http <span class="py-kw">import</span> slug <span class="cmt"># Example addon import</span></pre>
+            </div>
+            <h3 class="sub-section-title">Idiomatic Python:</h3>
+            <ul class="list-item">
+                <li>Favor readability. Avoid overly complex one-liners.</li>
+                <li>Use <code class="py-kw">dict()</code> or <code class="py-kw">list()</code> for copying, not <code class="field-name-text">.clone()</code>.</li>
+                <li>Use dict literals <code class="py-kw">{'key': val}</code> and <code class="field-name-text">my_dict.update(...)</code>.</li>
+                <li>Use meaningful variable names. Avoid redundant temporary variables.</li>
+                <li>Multiple return points are fine if they simplify logic.</li>
+                <li>Use Python builtins correctly (e.g., <code class="field-name-text">my_dict.get('key')</code>).</li>
+                <li>Use list/dict comprehensions, <code class="py-kw">map</code>, <code class="py-kw">filter</code> where they improve clarity.</li>
+                <li>Collections are boolean-ish (empty is False). Iterate directly on iterables (e.g., <code class="py-kw">for key in my_dict:</code>).</li>
+                <li>Use <code class="field-name-text">dict.setdefault()</code> for cleaner dictionary population.</li>
+                <li>Document code with docstrings and comments for tricky parts.</li>
+            </ul>
+            <h3 class="sub-section-title">Odoo Python Practices:</h3>
+            <ul class="list-item">
+                <li>Avoid creating custom generators/decorators; use Odoo API's.</li>
+                <li>Use ORM methods like <code class="field-name-text">filtered()</code>, <code class="field-name-text">mapped()</code>, <code class="field-name-text">sorted()</code>.</li>
+                <li>Propagate context using <code class="field-name-text">records.with_context(...)</code>. Be careful with <code class="field-name-text">default_</code> keys.</li>
+                <li>Design for extensibility: small, single-responsibility methods are better. Avoid hardcoding.</li>
+                <li><strong>Never call <code class="field-name-text">cr.commit()</code> directly</strong> unless you've explicitly created the cursor and handle transactions. Odoo framework manages this.</li>
+                <li>Use translation method <code class="field-name-text">_()</code> (e.g., <code class="field-name-text">self.env._('My String %s', my_var)</code>) only for static, literal strings. Do not translate field values this way (use <code class="field-name-text">translate=True</code> on field definition). Prefer <code class="py-kw">%</code> formatting, especially <code class="py-kw">%(varname)s</code> for multiple variables.</li>
+            </ul>
+            <h3 class="sub-section-title">Naming & Attribute Order:</h3>
+            <ul class="list-item">
+                <li>Model names: Singular (e.g., <code class="field-name-text">res.partner</code>). Transients: <code class="field-name-text">&lt;base_model&gt;.&lt;action&gt;</code>.</li>
+                <li>Python Class names: CamelCase (e.g., <code class="field-name-text">AccountInvoice</code>).</li>
+                <li>Variables: Model vars camelCase, others underscore_lowercase. Suffix with <code class="field-name-text">_id</code> or <code class="field-name-text">_ids</code> for record IDs.</li>
+                <li>x2many fields: suffix <code class="field-name-text">_ids</code>. Many2one fields: suffix <code class="field-name-text">_id</code>.</li>
+                <li>Method prefixes: <code class="field-name-text">_compute_&lt;field&gt;</code>, <code class="field-name-text">_search_&lt;field&gt;</code>, <code class="field-name-text">_default_&lt;field&gt;</code>, <code class="field-name-text">_onchange_&lt;field&gt;</code>, <code class="field-name-text">_check_&lt;constraint&gt;</code>, <code class="field-name-text">action_&lt;verb&gt;</code> (use <code class="field-name-text">self.ensure_one()</code>).</li>
+                <li>Model attribute order: Private attrs (<code class="field-name-text">_name</code>, etc.), default methods, fields, compute/search methods, selection methods, constraints/onchanges, CRUD overrides, action methods, other business methods.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-guideline-js">
+            <h2 class="section-title"><span class="icon"><i class="fab fa-js-square"></i></span>5. JavaScript</h2>
+            <h3 class="sub-section-title">Static File Organization:</h3>
+            <p class="description-text">
+                Located in <code class="file-name-text">static/</code>. Served at <code class="file-name-text">/&lt;module_name&gt;/static/...</code>.
+            </p>
+            <ul class="list-item">
+                <li><code class="file-name-text">static/lib/&lt;library_name&gt;/</code>: External JS libraries.</li>
+                <li><code class="file-name-text">static/src/js/</code>: Your JS files. Name per component (e.g., <code class="file-name-text">activity_widget.js</code>).</li>
+                <li><code class="file-name-text">static/src/xml/</code>: QWeb templates for JS components.</li>
+                <li><code class="file-name-text">static/tests/</code>: Test files, including <code class="file-name-text">tours/</code> for test tours.</li>
+            </ul>
+            <h3 class="sub-section-title">JS Coding Guidelines:</h3>
+            <ul class="list-item">
+                <li>Use <code class="field-name-text">'use strict';</code>.</li>
+                <li>Use a linter (e.g., ESLint, JSHint).</li>
+                <li>Never add minified JS libraries directly to your module; Odoo handles minification.</li>
+                <li>Class names: CamelCase.</li>
+                <li>Refer to detailed JS guidelines on Odoo's GitHub wiki.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-guideline-css">
+            <h2 class="section-title"><span class="icon"><i class="fab fa-css3-alt"></i></span>6. CSS and SCSS</h2>
+            <h3 class="sub-section-title">Formatting:</h3>
+            <ul class="list-item">
+                <li>4 space indents, no tabs. Max 80 chars wide.</li>
+                <li>Opening brace <code class="field-name-text">{</code> on same line as selector, space after. Closing brace <code class="field-name-text">}</code> on new line.</li>
+                <li>One declaration per line. Meaningful whitespace.</li>
+            </ul>
+            <h3 class="sub-section-title">Naming Conventions:</h3>
+            <ul class="list-item">
+                <li>Prefix classes with <code class="field-name-text">o_&lt;module_name&gt;_</code> (e.g., <code class="field-name-text">o_plant_nursery_my_component</code>). Webclient uses just <code class="field-name-text">o_</code>.</li>
+                <li>Avoid ID selectors. Avoid hyper-specific class names. Use "Grandchild" approach for nested elements (e.g., <code class="field-name-text">.o_element_entries</code> then <code class="field-name-text">.o_element_entry</code>).</li>
+            </ul>
+            <h3 class="sub-section-title">SCSS Variables:</h3>
+            <ul class="list-item">
+                <li>Global: <code class="field-name-text">$o-[root]-[element]-[property]-[modifier]</code> (e.g., <code class="field-name-text">$o-block-title-color-hover</code>).</li>
+                <li>Scoped (inside blocks): <code class="field-name-text">$-[variable_name]</code> (e.g., <code class="field-name-text">$-inner-gap</code>).</li>
+            </ul>
+            <h3 class="sub-section-title">SCSS Mixins & Functions:</h3>
+            <ul class="list-item">Name: <code class="field-name-text">o-[name]</code>. Optional args: <code class="field-name-text">$-[argument]</code>.</ul>
+            <h3 class="sub-section-title">CSS Variables (Custom Properties):</h3>
+            <ul class="list-item">
+                <li>Use for DOM-related contextual adaptations, not for global design system (use SCSS for that).</li>
+                <li>Convention: BEM-like <code class="field-name-text">--[root]__[element]-[property]--[modifier]</code>.</li>
+                <li>Define with fallbacks inside component's main block: <code class="field-name-text">color: var(--MyComponent-color, #{$o-default-color});</code></li>
+                <li>Avoid defining on <code class="field-name-text">:root</code> unless for templates shared across bundles.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Adhering to these guidelines promotes consistency and quality in Odoo development.
+    </footer>
+</body>
+</html>

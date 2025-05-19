@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Module Data: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { /* For general concept terms */
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; /* Light Purple */
+            color: #581c87; /* Dark Purple */ padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .method-name-text {
+            font-family: 'Source Code Pro', monospace; background-color: #e0e7ff;
+            color: #3730a3; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text { /* For model fields, XML attributes in text */
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-decorator { color: #61afef; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-num { color: #d19a66; } 
+        .code-block .py-param { color: #abb2bf; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;} 
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .xml-cmt { color: #5c6370; font-style: italic; } 
+        .code-block .op { color: #56b6c2; } /* Operators */
+        .code-block .bool { color: #d19a66; } /* Booleans True/False */
+        .code-block .csv-header { color: #e5c07b; font-weight: bold; }
+        .code-block .csv-val { color: #98c379; }
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .danger-note {
+            background-color: #fee2e2; border-left: 4px solid #ef4444; /* Red */
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #991b1b; font-size: 0.85rem;
+        }
+        .danger-note strong { color: #7f1d1d; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .method-name-text, .list-item .field-name-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-data-intro { border-left-color: #6b7280; } .cat-data-intro .section-title { color: #4b5563; }
+        .cat-data-declaration { border-left-color: #8b5cf6; } .cat-data-declaration .section-title { color: #7c3aed; } /* Violet */
+        .cat-data-formats { border-left-color: #f59e0b; } .cat-data-formats .section-title { color: #d97706; } /* Amber */
+        .cat-data-xml-techniques { border-left-color: #0ea5e9; } .cat-data-xml-techniques .section-title { color: #0284c7; } /* Sky Blue */
+        .cat-data-accessing { border-left-color: #10b981; } .cat-data-accessing .section-title { color: #059669; } /* Green */
+        .cat-data-advanced { border-left-color: #ec4899; } .cat-data-advanced .section-title { color: #db2777; } /* Pink */
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .danger-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Module Data: Cheatsheet</h1>
+        <p class="subtitle">Guide to defining master and demo data in Odoo modules.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-data-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-database"></i></span>1. Types of Module Data</h2>
+            <p class="description-text">
+                Odoo modules often require pre-defined data to function correctly or for demonstration purposes.
+            </p>
+            <ul class="list-disc pl-5 description-text">
+                <li><strong>Master Data:</strong> Essential for the module to work (e.g., views, actions, base configurations like countries, currencies). Always installed.</li>
+                <li><strong>Demo Data:</strong> For demonstration, testing, and quick setup. Loaded by default unless disabled (e.g., via <code class="field-name-text">--without-demo=all</code> server option).</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-data-declaration">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-file-alt"></i></span>2. Declaring Data in Manifest</h2>
+            <p class="description-text">
+                Data files (CSV or XML) must be listed in the module's <code class="field-name-text">__manifest__.py</code> file to be loaded by Odoo.
+            </p>
+            <ul class="list-disc pl-5 description-text">
+                <li>Use the <code class="field-name-text">'data'</code> key for master data files.</li>
+                <li>Use the <code class="field-name-text">'demo'</code> key for demo data files.</li>
+                <li>Both keys expect a list of strings, where each string is a relative path to a data file.</li>
+            </ul>
+            <h3 class="sub-section-title">Typical Folder Structure & Manifest Example:</h3>
+            <div class="code-block"><pre><span class="cmt"># __manifest__.py</span>
+{
+    <span class="py-st">'name'</span>: <span class="py-st">"Real Estate"</span>,
+    <span class="py-st">'depends'</span>: [...],
+    <span class="py-st">'data'</span>: [
+        <span class="py-st">'security/ir.model.access.csv'</span>,
+        <span class="py-st">'views/estate_property_views.xml'</span>, <span class="cmt"># Views are also data</span>
+        <span class="py-st">'data/estate_property_type_data.xml'</span>, <span class="cmt"># Master data</span>
+    ],
+    <span class="py-st">'demo'</span>: [
+        <span class="py-st">'demo/estate_property_demo.xml'</span>,   <span class="cmt"># Demo data</span>
+    ],
+    <span class="py-st">'application'</span>: <span class="py-kw">True</span>,
+}</pre>
+            </div>
+            <p class="description-text">
+                Common practice is to organize data files into folders: <code class="field-name-text">data/</code> for master, <code class="field-name-text">demo/</code> for demo, <code class="field-name-text">security/</code> for security data, and <code class="field-name-text">views/</code> for views/actions.
+            </p>
+        </section>
+
+        <section class="section-card cat-data-formats">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-file-code"></i></span>3. Data File Formats</h2>
+            <h3 class="sub-section-title">CSV Files</h3>
+            <p class="description-text">
+                Easiest for simple data, especially long lists for basic models. Limited features compared to XML.
+            </p>
+            <div class="code-block"><pre><span class="csv-header">id,name,sequence</span> <span class="cmt">&lt;!-- Header row defines fields --&gt;</span>
+estate_property_type_residential,<span class="csv-val">Residential</span>,<span class="csv-val">10</span>
+estate_property_type_commercial,<span class="csv-val">Commercial</span>,<span class="csv-val">20</span></pre>
+            </div>
+            <ul class="list-item">
+                <li>First row is the header defining field names.</li>
+                <li><code class="field-name-text">id</code> column: External ID for the record.</li>
+                <li>For relational fields (Many2one), use <code class="field-name-text">field_name:id</code> in header and <code class="field-name-text">module.external_id</code> as value.</li>
+            </ul>
+
+            <h3 class="sub-section-title">XML Files</h3>
+            <p class="description-text">
+                More powerful and flexible, preferred for complex data, relationships, or when needing advanced features like <code class="field-name-text">eval</code> or function calls.
+            </p>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">odoo</span>&gt;
+    &lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"unique_external_id_1"</span> <span class="xml-attr">model</span>=<span class="xml-val">"your.model.name"</span>&gt;
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"field_one"</span>&gt;Value A&lt;/<span class="xml-tag">field</span>&gt;
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"field_two"</span> <span class="xml-attr">eval</span>=<span class="xml-val">"50"</span>/&gt;
+    &lt;/<span class="xml-tag">record</span>&gt;
+    &lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"unique_external_id_2"</span> <span class="xml-attr">model</span>=<span class="xml-val">"your.model.name"</span>&gt;
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"field_one"</span>&gt;Value B&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;/<span class="xml-tag">record</span>&gt;
+&lt;/<span class="xml-tag">odoo</span>&gt;</pre>
+            </div>
+            <ul class="list-item">
+                <li>Main tag is <code class="field-name-text">&lt;odoo&gt;</code> (or <code class="field-name-text">&lt;data&gt;</code> as an alias).</li>
+                <li>Each record is defined by a <code class="field-name-text">&lt;record&gt;</code> tag.
+                    <ul>
+                        <li><code class="field-name-text">id</code> attribute: Unique external ID for this record.</li>
+                        <li><code class="field-name-text">model</code> attribute: Technical name of the Odoo model.</li>
+                    </ul>
+                </li>
+                <li><code class="field-name-text">&lt;field&gt;</code> tags set values for model fields. <code class="field-name-text">name</code> attribute is the field's technical name.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-data-xml-techniques">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-cogs"></i></span>4. Key XML Data Techniques</h2>
+            <ul class="list-item space-y-2">
+                <li><strong>Data Extension:</strong> To add/update fields on existing records (defined in other modules), use a <code class="field-name-text">&lt;record&gt;</code> tag with the *original* <code class="field-name-text">id</code> (including module prefix if from another module) and only specify fields to update.
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"base.partner_root"</span> <span class="xml-attr">model</span>=<span class="xml-val">"res.partner"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"comment"</span>&gt;Updated comment for root partner.&lt;/<span class="xml-tag">field</span>&gt;
+&lt;/<span class="xml-tag">record</span>&gt;</pre></div>
+                </li>
+                <li><strong>Linking Records (<code class="field-name-text">ref</code> attribute):</strong> For Many2one fields, use the <code class="field-name-text">ref</code> attribute on a <code class="field-name-text">&lt;field&gt;</code> tag. Its value is the external ID of the related record (e.g., <code class="xml-val">module_name.record_xml_id</code>).
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"property_type_id"</span> <span class="xml-attr">ref</span>=<span class="xml-val">"estate.estate_property_type_residential"</span>/&gt;</pre></div>
+                </li>
+                <li><strong>Evaluating Expressions (<code class="field-name-text">eval</code> attribute):</strong> Compute field values using Python expressions.
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"expected_price"</span> <span class="xml-attr">eval</span>=<span class="xml-val">"300000.0 * 1.1"</span>/&gt;
+&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"date_availability"</span> <span class="xml-attr">eval</span>=<span class="xml-val">"(datetime.date.today() + relativedelta(days=30)).strftime('%Y-%m-%d')"</span>/&gt;</pre></div>
+                </li>
+                 <li><strong>ORM Search (<code class="field-name-text">search</code> attribute):</strong> For setting a field based on an ORM search result (usually for Many2one, returns first record found).
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"account_id"</span> <span class="xml-attr">search</span>=<span class="xml-val">"[('code', '=', '101400'), ('company_id', '=', ref('base.main_company'))]"</span>/&gt;</pre></div>
+                </li>
+                <li><strong>Calling Model Methods (<code class="field-name-text">&lt;function&gt;</code> tag):</strong> Execute a Python method on a model.
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">function</span> <span class="xml-attr">model</span>=<span class="xml-val">"estate.property.offer"</span> <span class="xml-attr">name</span>=<span class="xml-val">"action_accept_offer"</span>&gt;
+    &lt;<span class="xml-tag">value</span> <span class="xml-attr">eval</span>=<span class="xml-val">"ref('estate.demo_offer_for_big_villa_1')"</span>/&gt; <span class="xml-cmt">&lt;!-- self for the method --&gt;</span>
+&lt;/<span class="xml-tag">function</span>&gt;</pre></div>
+                </li>
+                <li><strong>X2many Fields (<code class="field-name-text">Command</code> namespace):</strong> Use <code class="field-name-text">eval</code> with special "Command" tuples to manage One2many and Many2many fields.
+                    <ul class="list-disc pl-5">
+                        <li><code class="field-name-text">Command.create({'field': val, ...})</code> or <code class="field-name-text">(0, 0, {'field': val, ...})</code>: Create a new related record.</li>
+                        <li><code class="field-name-text">Command.link(related_record_id)</code> or <code class="field-name-text">(4, related_record_id, 0)</code>: Link an existing record (for M2M).</li>
+                        <li><code class="field-name-text">Command.set([ids])</code> or <code class="field-name-text">(6, 0, [ids])</code>: Replace all links with the provided list of IDs (for M2M).</li>
+                    </ul>
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"offer_ids"</span> <span class="xml-attr">eval</span>=<span class="xml-val">"[
+    Command.create({'partner_id': ref('base.res_partner_2'), 'price': 120000, 'status': 'accepted'}),
+    Command.create({'partner_id': ref('base.res_partner_12'), 'price': 115000, 'status': 'refused'})
+]"</span>/&gt;</pre></div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-data-accessing">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-hand-point-up"></i></span>5. Accessing Data Records</h2>
+            <p class="description-text">
+                Once data is loaded, you can reference these records using their XML IDs.
+            </p>
+            <ul class="list-item">
+                <li><strong>Python:</strong> <code class="method-name-text">self.env.ref('module_name.xml_id')</code>. Returns a recordset.</li>
+                <li><strong>XML:</strong> Use the <code class="field-name-text">ref="module_name.xml_id"</code> attribute (as seen above).</li>
+                <li><strong>CSV:</strong> For relational fields, use column header <code class="field-name-text">field_name:id</code> and value <code class="field-name-text">module_name.xml_id</code>.</li>
+            </ul>
+            <div class="danger-note"><strong>Data can be deleted by users.</strong> Always code defensively, checking if <code class="method-name-text">env.ref()</code> returns a record, or use <code class="field-name-text">raise_if_not_found=False</code>.</div>
+        </section>
+
+        <section class="section-card cat-data-advanced">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-star"></i></span>6. Advanced Topics</h2>
+            <ul class="list-item">
+                <li><strong>XML ID Mechanism:</strong> External IDs (<code class="field-name-text">xml_id</code>) are stored in the <code class="concept-text">ir.model.data</code> model, linking the ID string to the actual database record (model name and record ID).</li>
+                <li><strong>No Update (<code class="field-name-text">noupdate="1"</code>):</strong>
+                    In XML, placing <code class="field-name-text">noupdate="1"</code> on the <code class="field-name-text">&lt;odoo&gt;</code> or <code class="field-name-text">&lt;data&gt;</code> tag (or individual <code class="field-name-text">&lt;record&gt;</code> tags) means the records defined within will not be updated during a module upgrade if they already exist. They will still be created if they don't exist.
+                    <div class="important-note">Using <code class="field-name-text">odoo-bin -u module_name -i module_name</code> (or just <code class="field-name-text">-i</code> for initial install) *can* bypass this and reload data. Be cautious on production.</div>
+                </li>
+                <li><strong>Import as SQL:</strong> Possible for very large datasets or complex initializations, but generally discouraged as it bypasses ORM features, constraints, and security.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Define master and demo data effectively to build robust Odoo applications.
+    </footer>
+</body>
+</html>

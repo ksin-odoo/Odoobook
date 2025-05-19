@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo PDF Reports: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .method-name-text { /* For QWeb directives in text */
+            font-family: 'Source Code Pro', monospace; background-color: #dbeafe; /* Light blue */
+            color: #1e40af; /* Dark blue */ padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text { /* For XML attributes, model names in text */
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .qweb-dir { color: #c678dd; font-weight: 500;} /* QWeb directives t-if, t-out */
+        .code-block .expr { color: #61afef; } /* Expressions within directives */
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .method-name-text, .list-item .field-name-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-report-intro { border-left-color: #6b7280; } .cat-report-intro .section-title { color: #4b5563; }
+        .cat-report-structure { border-left-color: #8b5cf6; } .cat-report-structure .section-title { color: #7c3aed; } /* Violet */
+        .cat-report-template { border-left-color: #0ea5e9; } .cat-report-template .section-title { color: #0284c7; } /* Sky Blue */
+        .cat-report-action { border-left-color: #10b981; } .cat-report-action .section-title { color: #059669; } /* Green */
+        .cat-report-advanced { border-left-color: #f59e0b; } .cat-report-advanced .section-title { color: #d97706; } /* Amber */
+        .cat-report-extra { border-left-color: #ec4899; } .cat-report-extra .section-title { color: #db2777; } /* Pink */
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo PDF Reports: Cheatsheet</h1>
+        <p class="subtitle">Guide to creating printable PDF documents using QWeb templates in Odoo.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-report-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-file-pdf"></i></span>1. Introduction to PDF Reports</h2>
+            <p class="description-text">
+                PDF reports are essential for generating documents like invoices, sales orders, or custom business summaries. Odoo uses QWeb templates to define the structure and content of these reports.
+                Odoo can automatically add standard company headers/footers.
+            </p>
+            <div class="important-note"><strong>Prerequisite:</strong> This guide assumes familiarity with QWeb basics. Test with representative data to cover various scenarios.</div>
+        </section>
+
+        <section class="section-card cat-report-structure">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-folder-open"></i></span>2. File Structure & Manifest</h2>
+            <p class="description-text">
+                Report definitions typically involve two main parts: the QWeb template (XML) and a report action (XML).
+            </p>
+            <h3 class="sub-section-title">Typical File Organization:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li>Create a <code class="field-name-text">report/</code> directory in your module.</li>
+                <li>Store QWeb templates in files like <code class="field-name-text">my_report_templates.xml</code>.</li>
+                <li>Store report actions in a file like <code class="field-name-text">my_module_reports.xml</code>.</li>
+            </ul>
+            <h3 class="sub-section-title">Manifest Declaration:</h3>
+            <p class="description-text">
+                Add these XML files to the <code class="field-name-text">'data'</code> list in your module's <code class="field-name-text">__manifest__.py</code>. Files are loaded sequentially.
+            </p>
+            <div class="code-block"><pre><span class="cmt"># __manifest__.py</span>
+{
+    <span class="cmt"># ...</span>
+    <span class="py-st">'data'</span>: [
+        <span class="py-st">'security/ir.model.access.csv'</span>,
+        <span class="py-st">'views/my_views.xml'</span>,
+        <span class="py-st">'report/estate_property_templates.xml'</span>, <span class="cmt">&lt;!-- QWeb template definitions --&gt;</span>
+        <span class="py-st">'report/estate_property_reports.xml'</span>,  <span class="cmt">&lt;!-- Report action definitions --&gt;</span>
+    ],
+    <span class="cmt"># ...</span>
+}</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-report-template">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-file-invoice"></i></span>3. Basic Report Template (QWeb)</h2>
+            <p class="description-text">
+                A QWeb template defines the HTML structure that will be converted to PDF.
+            </p>
+            <h3 class="sub-section-title">Minimal Template Structure:</h3>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">odoo</span>&gt;
+    &lt;<span class="xml-tag">template</span> <span class="xml-attr">id</span>=<span class="xml-val">"unique_template_id_for_report"</span>&gt;
+        &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-call</span>=<span class="xml-val">"web.html_container"</span>&gt; <span class="cmt">&lt;!-- Wraps content for PDF conversion --&gt;</span>
+            &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-foreach</span>=<span class="xml-val">"docs"</span> <span class="qweb-dir">t-as</span>=<span class="xml-val">"doc"</span>&gt; <span class="cmt">&lt;!-- Loop through records passed to report --&gt;</span>
+                &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-call</span>=<span class="xml-val">"web.external_layout"</span>&gt; <span class="cmt">&lt;!-- Adds company header/footer --&gt;</span>
+                    &lt;<span class="xml-tag">div</span> <span class="xml-attr">class</span>=<span class="xml-val">"page"</span>&gt;
+                        <span class="cmt">&lt;!-- Your report content for each 'doc' record goes here --&gt;</span>
+                        &lt;<span class="xml-tag">h2</span>&gt;&lt;<span class="qweb-dir">span</span> <span class="qweb-dir">t-field</span>=<span class="xml-val">"doc.name"</span>/&gt;&lt;/<span class="xml-tag">h2</span>&gt;
+                        &lt;<span class="xml-tag">p</span>&gt;Expected Price: &lt;<span class="qweb-dir">span</span> <span class="qweb-dir">t-field</span>=<span class="xml-val">"doc.expected_price"</span> <span class="qweb-dir">t-options</span>=<span class="xml-val">"{'widget': 'monetary', 'display_currency': doc.company_id.currency_id}"</span>/&gt;&lt;/<span class="xml-tag">p</span>&gt;
+                        
+                        <span class="cmt">&lt;!-- Example: Listing offers --&gt;</span>
+                        &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-if</span>=<span class="xml-val">"doc.offer_ids"</span>&gt;
+                            &lt;<span class="xml-tag">h3</span>&gt;Offers:&lt;/<span class="xml-tag">h3</span>&gt;
+                            &lt;<span class="xml-tag">table</span> <span class="xml-attr">class</span>=<span class="xml-val">"table table-sm"</span>&gt; <span class="cmt">&lt;!-- Bootstrap classes can be used --&gt;</span>
+                                &lt;<span class="xml-tag">thead</span>&gt;
+                                    &lt;<span class="xml-tag">tr</span>&gt;&lt;<span class="xml-tag">th</span>&gt;Price&lt;/<span class="xml-tag">th</span>&gt;&lt;<span class="xml-tag">th</span>&gt;Partner&lt;/<span class="xml-tag">th</span>&gt;&lt;/<span class="xml-tag">tr</span>&gt;
+                                &lt;/<span class="xml-tag">thead</span>&gt;
+                                &lt;<span class="xml-tag">tbody</span>&gt;
+                                    &lt;<span class="xml-tag">tr</span> <span class="qweb-dir">t-foreach</span>=<span class="xml-val">"doc.offer_ids"</span> <span class="qweb-dir">t-as</span>=<span class="xml-val">"offer"</span>&gt;
+                                        &lt;<span class="xml-tag">td</span>&gt;&lt;<span class="qweb-dir">span</span> <span class="qweb-dir">t-field</span>=<span class="xml-val">"offer.price"</span>/&gt;&lt;/<span class="xml-tag">td</span>&gt;
+                                        &lt;<span class="xml-tag">td</span>&gt;&lt;<span class="qweb-dir">span</span> <span class="qweb-dir">t-field</span>=<span class="xml-val">"offer.partner_id.name"</span>/&gt;&lt;/<span class="xml-tag">td</span>&gt;
+                                    &lt;/<span class="xml-tag">tr</span>&gt;
+                                &lt;/<span class="xml-tag">tbody</span>&gt;
+                            &lt;/<span class="xml-tag">table</span>&gt;
+                        &lt;/<span class="qweb-dir">t</span>&gt;
+                        &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-else</span>=<span class="xml-val">""</span>&gt;
+                            &lt;<span class="xml-tag">p</span>&gt;No offers yet for this property.&lt;/<span class="xml-tag">p</span>&gt;
+                        &lt;/<span class="qweb-dir">t</span>&gt;
+                    &lt;/<span class="xml-tag">div</span>&gt;
+                &lt;/<span class="qweb-dir">t</span>&gt; <span class="cmt">&lt;!-- end web.external_layout --&gt;</span>
+            &lt;/<span class="qweb-dir">t</span>&gt; <span class="cmt">&lt;!-- end t-foreach docs --&gt;</span>
+        &lt;/<span class="qweb-dir">t</span>&gt; <span class="cmt">&lt;!-- end web.html_container --&gt;</span>
+    &lt;/<span class="xml-tag">template</span>&gt;
+&lt;/<span class="xml-tag">odoo</span>&gt;</pre>
+            </div>
+            <p class="description-text">Key elements:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="method-name-text">&lt;template id="..."&gt;</code>: Defines the QWeb template.</li>
+                <li><code class="method-name-text">t-call="web.html_container"</code>: Essential wrapper for PDF generation.</li>
+                <li><code class="method-name-text">t-foreach="docs" t-as="doc"</code>: Iterates over the recordset(s) passed to the report. <code class="field-name-text">docs</code> is the standard variable holding these records.</li>
+                <li><code class="method-name-text">t-call="web.external_layout"</code>: Includes the default company header and footer. Can be customized or replaced.</li>
+                <li><code class="field-name-text">class="page"</code>: Standard div class for page content.</li>
+                <li>Use QWeb directives like <code class="method-name-text">t-field</code>, <code class="method-name-text">t-set</code>, <code class="method-name-text">t-if</code>, <code class="method-name-text">t-foreach</code> to dynamically display data.</li>
+                <li>Bootstrap CSS classes (e.g., <code class="field-name-text">table</code>, <code class="field-name-text">table-sm</code>) and Font Awesome icons can be used.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-report-action">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-print"></i></span>4. Report Action (<code class="concept-text">ir.actions.report</code>)</h2>
+            <p class="description-text">
+                An action is needed to make the report available in Odoo (e.g., in the "Print" menu of a view or linked to a button).
+            </p>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">odoo</span>&gt;
+    &lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"action_report_property_offers"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.actions.report"</span>&gt;
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;Property Offers&lt;/<span class="xml-tag">field</span>&gt;
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"model"</span>&gt;estate.property&lt;/<span class="xml-tag">field</span>&gt; <span class="xml-cmt">&lt;!-- The model this report is for --&gt;</span>
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"report_type"</span>&gt;qweb-pdf&lt;/<span class="xml-tag">field</span>&gt; <span class="xml-cmt">&lt;!-- For PDF reports --&gt;</span>
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"report_name"</span>&gt;your_module_name.unique_template_id_for_report&lt;/<span class="xml-tag">field</span>&gt; <span class="xml-cmt">&lt;!-- module.template_id --&gt;</span>
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"report_file"</span>&gt;your_module_name.unique_template_id_for_report&lt;/<span class="xml-tag">field</span>&gt; <span class="xml-cmt">&lt;!-- Can be same as report_name --&gt;</span>
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"print_report_name"</span>&gt;'Property Offers - %s' % (object.name)&lt;/<span class="xml-tag">field</span>&gt; <span class="xml-cmt">&lt;!-- Filename for downloaded PDF --&gt;</span>
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"binding_model_id"</span> <span class="xml-attr">ref</span>=<span class="xml-val">"model_estate_property"</span>/&gt; <span class="xml-cmt">&lt;!-- Adds to Print menu of this model --&gt;</span>
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"binding_type"</span>&gt;report&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;/<span class="xml-tag">record</span>&gt;
+&lt;/<span class="xml-tag">odoo</span>&gt;</pre>
+            </div>
+            <p class="description-text">Key fields for <code class="concept-text">ir.actions.report</code>:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="field-name-text">name</code>: User-friendly name for the report.</li>
+                <li><code class="field-name-text">model</code>: Technical name of the main model for the report.</li>
+                <li><code class="field-name-text">report_type</code>: Set to <code class="xml-val">'qweb-pdf'</code> for PDF reports.</li>
+                <li><code class="field-name-text">report_name</code>: External ID of the QWeb template (<code class="xml-val">module.template_xml_id</code>).</li>
+                <li><code class="field-name-text">print_report_name</code>: Python expression to generate the downloaded PDF filename (e.g., using <code class="field-name-text">object.name</code>).</li>
+                <li><code class="field-name-text">binding_model_id</code>: Links the report to the "Print" menu of the specified model.</li>
+                <li><code class="field-name-text">binding_type</code>: Usually <code class="xml-val">'report'</code>.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-report-advanced">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-code-branch"></i></span>5. Sub-Templates & Inheritance</h2>
+            <h3 class="sub-section-title">Using Sub-Templates</h3>
+            <p class="description-text">
+                Break down complex reports into smaller, reusable QWeb templates. Call a sub-template using <code class="method-name-text">t-call</code>.
+            </p>
+            <div class="code-block"><pre><span class="xml-cmt">&lt;!-- Main Report Template --&gt;</span>
+&lt;<span class="xml-tag">template</span> <span class="xml-attr">id</span>=<span class="xml-val">"main_report"</span>&gt;
+    ...
+    &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-call</span>=<span class="xml-val">"your_module.offers_table_subtemplate"</span>&gt;
+        &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-set</span>=<span class="xml-val">"offers_list"</span> <span class="qweb-dir">t-value</span>=<span class="xml-val">"doc.offer_ids"</span>/&gt; <span class="cmt">&lt;!-- Pass data to sub-template --&gt;</span>
+    &lt;/<span class="qweb-dir">t</span>&gt;
+    ...
+&lt;/<span class="xml-tag">template</span>&gt;
+
+<span class="xml-cmt">&lt;!-- Sub-Template Definition --&gt;</span>
+&lt;<span class="xml-tag">template</span> <span class="xml-attr">id</span>=<span class="xml-val">"offers_table_subtemplate"</span>&gt;
+    &lt;<span class="xml-tag">table</span> <span class="xml-attr">class</span>=<span class="xml-val">"table"</span>&gt;
+        <span class="cmt">&lt;!-- Use 'offers_list' variable passed from parent --&gt;</span>
+        &lt;<span class="xml-tag">tr</span> <span class="qweb-dir">t-foreach</span>=<span class="xml-val">"offers_list"</span> <span class="qweb-dir">t-as</span>=<span class="xml-val">"offer"</span>&gt;
+            &lt;<span class="xml-tag">td</span>&gt;&lt;<span class="qweb-dir">span</span> <span class="qweb-dir">t-field</span>=<span class="xml-val">"offer.price"</span>/&gt;&lt;/<span class="xml-tag">td</span>&gt;
+        &lt;/<span class="xml-tag">tr</span>&gt;
+    &lt;/<span class="xml-tag">table</span>&gt;
+&lt;/<span class="xml-tag">template</span>&gt;</pre>
+            </div>
+
+            <h3 class="sub-section-title">Report Inheritance</h3>
+            <p class="description-text">
+                Extend existing QWeb report templates from other modules using XPath, similar to view inheritance.
+                Add the <code class="field-name-text">inherit_id</code> attribute to your <code class="field-name-text">&lt;template&gt;</code> tag, referencing the parent template's external ID.
+            </p>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">template</span> <span class="xml-attr">id</span>=<span class="xml-val">"extended_property_report"</span> <span class="xml-attr">inherit_id</span>=<span class="xml-val">"original_module.original_property_report_template"</span>&gt;
+    &lt;<span class="xml-tag">xpath</span> <span class="xml-attr">expr</span>=<span class="xml-val">"//div[@class='page']/h2"</span> <span class="xml-attr">position</span>=<span class="xml-val">"after"</span>&gt;
+        &lt;<span class="qweb-dir">t</span> <span class="qweb-dir">t-if</span>=<span class="xml-val">"doc.invoice_id"</span>&gt;
+            &lt;<span class="xml-tag">p</span>&gt;Invoice: &lt;<span class="qweb-dir">span</span> <span class="qweb-dir">t-field</span>=<span class="xml-val">"doc.invoice_id.name"</span>/&gt;&lt;/<span class="xml-tag">p</span>&gt;
+        &lt;/<span class="qweb-dir">t</span>&gt;
+    &lt;/<span class="xml-tag">xpath</span>&gt;
+&lt;/<span class="xml-tag">template</span>&gt;</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-report-extra">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-plus-circle"></i></span>6. Additional Features</h2>
+            <ul class="list-disc pl-5 description-text">
+                <li><strong>Translations:</strong> QWeb reports support Odoo's translation mechanism. Avoid unnecessary spaces in text content for better translation.</li>
+                <li><strong>Reports as Web Pages:</strong> Reports can be viewed directly in a web browser (e.g., <code class="field-name-text">/report/html/your_module.report_name/doc_ids</code>). Security checks still apply.</li>
+                <li><strong>Barcodes:</strong> Embed barcodes using Odoo's built-in generator (e.g., <code class="method-name-text">&lt;img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 600, 100)"/&gt;</code>).</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Create professional PDF reports in Odoo using the power of QWeb templates.
+    </footer>
+</body>
+</html>
