@@ -1,0 +1,2 @@
+# Odoobook
+Odoo Cheatsheet
