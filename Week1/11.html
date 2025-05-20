@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo UI Enhancements: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .attribute-name-text, .tag-name-text, .model-attribute-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .status-tag { 
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.375rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            margin-left: 0.5rem; 
+            line-height: 1.2; 
+            vertical-align: middle; 
+        }
+        .status-must-tag {
+            background-color: #fee2e2; /* Red 100 */
+            color: #b91c1c; /* Red 700 */
+            border: 1px solid #fecaca; /* Red 200 */
+        }
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-param { color: #abb2bf; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;}
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; 
+            padding: 0.65rem 0.9rem; margin: 0.5rem 0;
+            border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .attribute-name-text, .list-item .tag-name-text, .list-item .model-attribute-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-uiplus-intro { border-left-color: #6b7280; } .cat-uiplus-intro .section-title { color: #4b5563; }
+        .cat-uiplus-inlineviews { border-left-color: #8b5cf6; } .cat-uiplus-inlineviews .section-title { color: #7c3aed; }
+        .cat-uiplus-widgets { border-left-color: #0ea5e9; } .cat-uiplus-widgets .section-title { color: #0284c7; }
+        .cat-uiplus-ordering { border-left-color: #10b981; } .cat-uiplus-ordering .section-title { color: #059669; }
+        .cat-uiplus-attrs { border-left-color: #f59e0b; } .cat-uiplus-attrs .section-title { color: #d97706; }
+        .cat-uiplus-search { border-left-color: #ec4899; } .cat-uiplus-search .section-title { color: #db2777; }
+        .cat-uiplus-statbuttons { border-left-color: #6366f1; } .cat-uiplus-statbuttons .section-title { color: #4f46e5; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo UI Enhancements: Cheatsheet</h1>
+        <p class="subtitle">Adding "sprinkles" to views for better user experience.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-uiplus-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-magic"></i></span>1. Introduction: Refining the UI</h2>
+            <p class="description-text">
+                Beyond basic views and actions, Odoo allows fine-tuning the user interface for better clarity, efficiency, and visual appeal. This includes custom list displays within forms, specialized field widgets, custom sorting, conditional visibility of elements, and informative stat buttons.
+            </p>
+        </section>
+
+        <section class="section-card cat-uiplus-inlineviews">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-stream"></i></span>2. Inline Views for One2many Fields</h2>
+            <p class="description-text">
+                Instead of using the default list view for a <code class="attribute-name-text">One2many</code> field within a form, you can define a custom, simplified list view directly inside the form view's XML. This is useful for showing only relevant columns of related records.
+            </p>
+            <h3 class="sub-section-title">Example: Displaying specific property fields on a Property Type form.</h3>
+            <div class="code-block"><pre><span class="xml-cmt">&lt;!-- In estate.property.type form view --&gt;</span>
+&lt;<span class="xml-tag">form</span>&gt;
+    &lt;<span class="xml-tag">sheet</span>&gt;
+        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>/&gt;
+        &lt;<span class="xml-tag">notebook</span>&gt;
+            &lt;<span class="xml-tag">page</span> <span class="xml-attr">string</span>=<span class="xml-val">"Properties"</span>&gt;
+                &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"property_ids"</span>&gt; <span class="cmt">&lt;!-- One2many field --&gt;</span>
+                    &lt;<span class="xml-tag">tree</span> <span class="xml-attr">string</span>=<span class="xml-val">"Properties"</span>&gt; <span class="cmt">&lt;!-- Inline list view definition --&gt;</span>
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>/&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"expected_price"</span>/&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"state"</span>/&gt;
+                    &lt;/<span class="xml-tag">tree</span>&gt;
+                &lt;/<span class="xml-tag">field</span>&gt;
+            &lt;/<span class="xml-tag">page</span>&gt;
+        &lt;/<span class="xml-tag">notebook</span>&gt;
+    &lt;/<span class="xml-tag">sheet</span>&gt;
+&lt;/<span class="xml-tag">form</span>&gt;</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-uiplus-widgets">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-tools"></i></span>3. Widgets for Field Display</h2>
+            <p class="description-text">
+                Odoo automatically chooses a default widget based on field type (e.g., date picker for <code class="attribute-name-text">Date</code> fields). The <code class="attribute-name-text">widget</code> attribute in view XML allows you to specify a different representation.
+            </p>
+            <h3 class="sub-section-title">Example: Statusbar for a Selection field.</h3>
+            <div class="code-block"><pre><span class="xml-cmt">&lt;!-- In estate.property form view header --&gt;</span>
+&lt;<span class="xml-tag">header</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"state"</span> <span class="xml-attr">widget</span>=<span class="xml-val">"statusbar"</span> <span class="xml-attr">statusbar_visible</span>=<span class="xml-val">"new,offer_received,offer_accepted,sold"</span>/&gt;
+&lt;/<span class="xml-tag">header</span>&gt;</pre>
+            </div>
+            <p class="description-text">
+                Common widgets include <code class="attribute-name-text">many2many_tags</code>, <code class="attribute-name-text">statusbar</code>, <code class="attribute-name-text">monetary</code>, <code class="attribute-name-text">priority</code>, <code class="attribute-name-text">handle</code> (for manual sequencing). Some widgets accept <code class="attribute-name-text">options</code>.
+            </p>
+            <div class="warning-note"><strong>Unique Field Display:</strong> Add a field only once to a specific list or form view section. Adding it multiple times is not supported and can lead to unexpected behavior.</div>
+        </section>
+
+        <section class="section-card cat-uiplus-ordering">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-sort-amount-down"></i></span>4. List Order Customization</h2>
+            <p class="description-text">
+                Define the default sort order for records in list views.
+            </p>
+            <h3 class="sub-section-title">Model Level Ordering (<code class="model-attribute-text">_order</code> attribute):</h3>
+            <p class="description-text">Set in the Python model definition for consistent ordering across all views and programmatic access. Takes a string of field names (e.g., <code class="py-st">"name asc, date_availability desc"</code>).</p>
+            <div class="code-block"><pre><span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span>
+    <span class="py-meta">_order</span> = <span class="py-st">"id desc"</span> <span class="cmt"># Default order by ID descending</span></pre>
+            </div>
+            <h3 class="sub-section-title">View Level Ordering (<code class="attribute-name-text">default_order</code> attribute):</h3>
+            <p class="description-text">Overrides model-level order for a specific list view. Add to the <code class="tag-name-text">&lt;tree&gt;</code> or <code class="tag-name-text">&lt;list&gt;</code> tag.</p>
+            <h3 class="sub-section-title">Manual Ordering (Sequence Field & Handle Widget):</h3>
+            <p class="description-text">Allow users to manually reorder records.</p>
+            <ol class="list-decimal pl-5 description-text">
+                <li>Add an <code class="attribute-name-text">Integer</code> field named <code class="attribute-name-text">sequence</code> to your model.</li>
+                <li>Set this <code class="attribute-name-text">sequence</code> field as the first criterion in the model's <code class="model-attribute-text">_order</code> attribute.</li>
+                <li>In the list view, add the <code class="attribute-name-text">sequence</code> field with <code class="attribute-name-text">widget="handle"</code>.</li>
+            </ol>
+        </section>
+
+        <section class="section-card cat-uiplus-attrs">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-cogs"></i></span>5. View Attributes & Options</h2>
+            <h3 class="sub-section-title">Form View Enhancements:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li><strong>Widget Options:</strong> Some widgets accept an <code class="attribute-name-text">options</code> attribute.
+                    <ul class="list-disc pl-5 mt-1">
+                        <li>For <code class="attribute-name-text">Many2one</code>: <code class="attribute-name-text">options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"</code> to disable creating/opening related records from the field.</li>
+                        <li>For <code class="attribute-name-text">Many2many</code> with <code class="attribute-name-text">widget="many2many_tags"</code>: <code class="attribute-name-text">options="{'color_field': 'color'}"</code> to use a 'color' integer field on the tag model for tag colors.</li>
+                    </ul>
+                </li>
+                <li><strong>Conditional Display/Behavior (<code class="attribute-name-text">attrs</code>):</strong> Make fields or UI elements <code class="attribute-name-text">invisible</code>, <code class="attribute-name-text">readonly</code>, or <code class="attribute-name-text">required</code> based on other field values.
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"garden_area"</span> <span class="xml-attr">attrs</span>=<span class="xml-val">"{'invisible': [('garden', '=', False)]}"</span>/&gt;
+&lt;<span class="xml-tag">button</span> <span class="xml-attr">name</span>=<span class="xml-val">"action_sold"</span> <span class="xml-attr">attrs</span>=<span class="xml-val">"{'invisible': [('state', 'in', ['sold', 'cancelled'])]}"</span>/&gt;</pre></div>
+                    <div class="warning-note">Fields used in <code class="attribute-name-text">attrs</code> expressions <span class="status-must-tag">MUST</span> be present in the view (can be hidden with <code class="attribute-name-text">invisible="1"</code>). <code class="attribute-name-text">readonly</code> in views is a UI hint, not a security measure.</div>
+                </li>
+            </ul>
+            <h3 class="sub-section-title">List View Enhancements:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="attribute-name-text">editable="bottom"</code> or <code class="attribute-name-text">editable="top"</code>: Allows inline editing of records directly in the list view.</li>
+                <li><code class="attribute-name-text">optional="show"</code> or <code class="attribute-name-text">optional="hide"</code> on <code class="tag-name-text">&lt;field&gt;</code>: Makes a column optionally visible/hidden by default via the column selector.</li>
+                <li><strong>Decorations:</strong> Conditionally color-code rows based on field values (e.g., <code class="attribute-name-text">decoration-success="state=='accepted'"</code>, <code class="attribute-name-text">decoration-danger="state=='refused'"</code>, <code class="attribute-name-text">decoration-muted="state=='sold'"</code>).
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">list</span> <span class="xml-attr">decoration-success</span>=<span class="xml-val">"state == 'offer_accepted'"</span> <span class="xml-attr">decoration-danger</span>=<span class="xml-val">"state == 'refused'"</span>&gt;
+    <span class="cmt">&lt;!-- ... fields ... --&gt;</span>
+&lt;/<span class="xml-tag">list</span>&gt;</pre></div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-uiplus-search">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-filter"></i></span>6. Search View Tweaks</h2>
+            <ul class="list-disc pl-5 description-text">
+                <li><strong>Default Filters:</strong> Use <code class="attribute-name-text">search_default_{$name}</code> in an action's context to activate a filter by default. <code class="attribute-name-text">{$name}</code> is the <code class="attribute-name-text">name</code> attribute of the <code class="tag-name-text">&lt;filter&gt;</code> tag in the search view.
+                    <div class="code-block"><pre><span class="xml-cmt">&lt;!-- In ir.actions.act_window record --&gt;</span>
+&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"context"</span>&gt;{'search_default_filter_available': 1}&lt;/<span class="xml-tag">field</span>&gt;</pre></div>
+                </li>
+                <li><strong>Custom Field Search (<code class="attribute-name-text">filter_domain</code>):</strong> Override the default search behavior for a field in the search view. <code class="concept-text">self</code> represents the user's input.
+                    <div class="code-block"><pre>&lt;<span class="xml-tag">search</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"living_area"</span> <span class="xml-attr">filter_domain</span>=<span class="xml-val">"[('living_area', '>=', self)]"</span>/&gt;
+&lt;/<span class="xml-tag">search</span>&gt;</pre></div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-uiplus-statbuttons">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-chart-bar"></i></span>7. Stat Buttons</h2>
+            <p class="description-text">
+                Stat buttons on form views provide quick access/counts of related records.
+            </p>
+            <h3 class="sub-section-title">General Approach:</h3>
+            <ol class="list-decimal pl-5 description-text">
+                <li><strong>Create necessary fields:</strong>
+                    <ul class="list-disc pl-5 mt-1">
+                        <li>Often a <code class="concept-text">One2many</code> field on the "parent" model (e.g., on Property Type to show its Properties, or Offers related to those properties).</li>
+                        <li>A <code class="concept-text">compute</code> field on the "parent" model to count the related records (e.g., <code class="attribute-name-text">offer_count</code> on Property Type). This might involve related fields if the direct link isn't there.</li>
+                    </ul>
+                </li>
+                <li><strong>Add Button to Form View:</strong> Use <code class="tag-name-text">&lt;button type="action"&gt;</code>.
+                    <ul class="list-disc pl-5 mt-1">
+                        <li>The <code class="attribute-name-text">name</code> attribute refers to an <code class="concept-text">ir.actions.act_window</code> XML ID.</li>
+                        <li>Use <code class="attribute-name-text">class="oe_stat_button"</code> and an <code class="attribute-name-text">icon</code>.</li>
+                        <li>Inside the button, display the computed count field.</li>
+                    </ul>
+                </li>
+                <li><strong>Define the Action:</strong> The <code class="concept-text">ir.actions.act_window</code> should:
+                    <ul class="list-disc pl-5 mt-1">
+                        <li>Target the model of the related records (e.g., <code class="model-name-text">estate.property.offer</code>).</li>
+                        <li>Use <code class="attribute-name-text">context</code> and/or <code class="attribute-name-text">domain</code> to filter records based on the current record (e.g., using <code class="attribute-name-text">active_id</code> in the domain to show offers for the current property type).</li>
+                    </ul>
+                </li>
+            </ol>
+            <div class="code-block"><pre><span class="xml-cmt">&lt;!-- Example Stat Button on estate.property.type form view --&gt;</span>
+&lt;<span class="xml-tag">button</span> <span class="xml-attr">class</span>=<span class="xml-val">"oe_stat_button"</span> <span class="xml-attr">icon</span>=<span class="xml-val">"fa-money-bill-wave"</span> <span class="xml-attr">type</span>=<span class="xml-val">"action"</span> 
+        <span class="xml-attr">name</span>=<span class="xml-val">"%(your_module.action_property_type_offers)d"</span>
+        <span class="xml-attr">context</span>=<span class="xml-val">"{'default_property_type_id': active_id, 'search_default_property_type_id': active_id}"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">string</span>=<span class="xml-val">"Offers"</span> <span class="xml-attr">name</span>=<span class="xml-val">"offer_count"</span> <span class="xml-attr">widget</span>=<span class="xml-val">"statinfo"</span>/&gt;
+&lt;/<span class="xml-tag">button</span>&gt;
+
+<span class="xml-cmt">&lt;!-- Corresponding Action (ir.actions.act_window) --&gt;</span>
+&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"action_property_type_offers"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.actions.act_window"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;Offers for Property Type&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"res_model"</span>&gt;estate.property.offer&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"view_mode"</span>&gt;tree,form&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"domain"</span>&gt;[('property_type_id', '=', active_id)]&lt;/<span class="xml-tag">field</span>&gt; <span class="cmt">&lt;-- Filter by current type --&gt;</span>
+&lt;/<span class="xml-tag">record</span>&gt;</pre>
+            </div>
+            <p class="description-text"><code class="attribute-name-text">Related fields</code> can simplify getting data from linked records for computed fields (e.g., <code class="py-st">property_type_id = fields.Many2one(related="property_id.property_type_id", store=True)</code> on an offer model).</p>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Enhance your Odoo application's usability with these UI "sprinkles".
+    </footer>
+    <script>
+        function toggleOptionsList(labelElement) {
+            const optionsList = labelElement.nextElementSibling; 
+            const icon = labelElement.querySelector('.toggle-icon i');
+            if (optionsList.style.display === 'none' || optionsList.style.display === '') {
+                optionsList.style.display = 'block';
+                labelElement.classList.add('open');
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                optionsList.style.display = 'none';
+                labelElement.classList.remove('open');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.options-list-label .toggle-icon i').forEach(icon => {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            });
+            document.querySelectorAll('.options-list').forEach(list => {
+                list.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

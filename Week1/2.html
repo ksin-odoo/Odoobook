@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo: Creating a New Application - Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .file-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #d1fae5; 
+            color: #065f46; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+
+        /* Updated Status Indicators - Icon Only */
+        .status-indicator {
+            display: inline-block; /* Allows margin and consistent alignment */
+            margin-right: 0.4rem; /* Space after the icon */
+            font-size: 0.9em; /* Adjust icon size relative to text */
+            width: 1.2em; /* Ensure consistent width for alignment */
+            text-align: center;
+        }
+        .status-must i {
+            color: #c2410c; /* Amber 700 */
+        }
+        .status-optional i {
+            color: #047857; /* Emerald 700 */
+        }
+        .status-recommended i {
+            color: #0284c7; /* Sky 600 */
+        }
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;}
+        .code-block .path { color: #61afef; } 
+        .code-block .dir { color: #e5c07b; } 
+        .code-block .file { color: #98c379; } 
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; 
+            padding: 0.65rem 0.9rem; margin: 0.5rem 0; /* Adjusted margin for OL */
+            border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; display: flex; align-items: flex-start;}
+        .list-item .field-name-text { font-size: 0.85rem; }
+        .checklist {
+            background-color: #f0f9ff; /* Light sky blue */
+            border: 1px solid #bae6fd; /* Sky blue border */
+            border-left-width: 4px;
+            border-left-color: #0ea5e9; /* Sky blue accent */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        .checklist-title {
+            font-weight: 600;
+            color: #0c4a6e; /* Darker sky blue */
+            margin-bottom: 0.5rem;
+        }
+        .checklist ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+            color: #075985;
+        }
+        .checklist li .status-indicator { /* For icons in checklist */
+             color: #0ea5e9;
+        }
+        
+        /* Category Colors */
+        .cat-app-intro { border-left-color: #6b7280; } .cat-app-intro .section-title { color: #4b5563; }
+        .cat-app-setup { border-left-color: #8b5cf6; } .cat-app-setup .section-title { color: #7c3aed; }
+        .cat-app-manifest { border-left-color: #0ea5e9; } .cat-app-manifest .section-title { color: #0284c7; }
+        .cat-app-verify { border-left-color: #10b981; } .cat-app-verify .section-title { color: #059669; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo: Creating a New Application - Cheatsheet</h1>
+        <p class="subtitle">Laying the foundation for a new Odoo module.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-app-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-rocket"></i></span>1. Purpose: Starting a New Module</h2>
+            <p class="description-text">
+                This chapter focuses on creating the basic "empty shell" of a new Odoo module. The example used is a "Real Estate Advertisement" module.
+            </p>
+            <div class="important-note"><strong>Good Practice:</strong> Before developing a new module, always check if Odoo already provides a solution for the business case.</div>
+        </section>
+
+        <section class="section-card cat-app-setup">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-folder-plus"></i></span>2. Preparing the Addon Directory</h2>
+            <p class="description-text">
+                The goal is to make Odoo recognize your new module. This involves creating a directory for your module and the essential files within it.
+            </p>
+            <h3 class="sub-section-title">Steps:</h3>
+            <ol class="list-decimal pl-5 description-text">
+                <li><strong>Create Module Directory:</strong>
+                    <p>In your Odoo addons path (e.g., <code class="file-name-text">/home/$USER/src/tutorials/</code>), create a new directory for your module. For the example, this is <code class="file-name-text">estate</code>.</p>
+                    <div class="code-block"><pre><span class="path">/home/$USER/src/tutorials/</span>
+└── <span class="dir">estate/</span></pre></div>
+                </li>
+                <li><strong>Create Essential Files:</strong>
+                    <p>A module requires at least two files:</p>
+                    <ul class="list-disc pl-5 mt-1">
+                        <li><code class="file-name-text">__init__.py</code>: Can be empty initially. Makes the module directory a Python package.</li>
+                        <li><code class="file-name-text">__manifest__.py</code>: Describes the module to Odoo. Cannot be empty.</li>
+                    </ul>
+                    <div class="code-block"><pre><span class="path">/home/$USER/src/tutorials/estate/</span>
+├── <span class="file">__init__.py</span>
+└── <span class="file">__manifest__.py</span></pre></div>
+                </li>
+            </ol>
+            <div class="checklist">
+                <h4 class="checklist-title">Quick Checklist for Basic Module Recognition:</h4>
+                <ul>
+                    <li><span class="status-indicator"><i class="fas fa-check-circle"></i></span>Module directory created (e.g., <code class="file-name-text">estate</code>).</li>
+                    <li><span class="status-indicator"><i class="fas fa-check-circle"></i></span><code class="file-name-text">__init__.py</code> file inside the module directory (<span class="status-optional"><i class="fas fa-info-circle"></i></span> to have content, but file itself is needed).</li>
+                    <li><span class="status-indicator"><i class="fas fa-check-circle"></i></span><code class="file-name-text">__manifest__.py</code> file inside the module directory.</li>
+                    <li><span class="status-must"><i class="fas fa-exclamation-triangle"></i></span><code class="field-name-text">'name'</code> key defined in <code class="file-name-text">__manifest__.py</code>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section-card cat-app-manifest">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-file-invoice"></i></span>3. The Manifest File (<code class="file-name-text">__manifest__.py</code>)</h2>
+            <p class="description-text">
+                This Python dictionary file describes your module.
+            </p>
+            <h3 class="sub-section-title">Key Manifest Fields:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><span class="status-must"><i class="fas fa-exclamation-triangle"></i></span><code class="field-name-text">'name'</code> (String): The human-readable name of your module.</li>
+                <li class="list-item"><span class="status-optional"><i class="fas fa-info-circle"></i></span><code class="field-name-text">'depends'</code> (List of strings): Lists other modules that this module depends on. (<span class="status-recommended"><i class="fas fa-star"></i></span> Recommended to include <code class="field-name-text">'base'</code>). Odoo ensures these are installed first. Example: <code class="py-st">['base', 'mail']</code>.</li>
+                <li class="list-item"><span class="status-optional"><i class="fas fa-info-circle"></i></span><code class="field-name-text">'application'</code> (Boolean): Set to <code class="py-kw">True</code> to make the module appear as an "App" in the Odoo Apps list.</li>
+                <li class="list-item"><span class="status-optional"><i class="fas fa-info-circle"></i></span>Common fields: <code class="field-name-text">'version'</code>, <code class="field-name-text">'summary'</code>, <code class="field-name-text">'description'</code>, <code class="field-name-text">'author'</code>, <code class="field-name-text">'website'</code>, <code class="field-name-text">'category'</code>, <code class="field-name-text">'data'</code>, <code class="field-name-text">'demo'</code>, <code class="field-name-text">'installable'</code>, <code class="field-name-text">'auto_install'</code>.</li>
+            </ul>
+            <h3 class="sub-section-title">Example <code class="file-name-text">__manifest__.py</code>:</h3>
+            <div class="code-block"><pre><span class="cmt"># -*- coding: utf-8 -*-</span>
+{
+    <span class="py-st">'name'</span>: <span class="py-st">"Real Estate"</span>, <span class="cmt"># MUST</span>
+    <span class="py-st">'version'</span>: <span class="py-st">'1.0'</span>, <span class="cmt"># Optional</span>
+    <span class="py-st">'summary'</span>: <span class="py-st">'Manage Real Estate Advertisements'</span>, <span class="cmt"># Optional</span>
+    <span class="py-st">'description'</span>: <span class="py-st">"""A longer description of the module's purpose."""</span>, <span class="cmt"># Optional</span>
+    <span class="py-st">'author'</span>: <span class="py-st">'Your Name'</span>, <span class="cmt"># Optional</span>
+    <span class="py-st">'website'</span>: <span class="py-st">'https://www.yourwebsite.com'</span>, <span class="cmt"># Optional</span>
+    <span class="py-st">'category'</span>: <span class="py-st">'Real Estate/Brokerage'</span>, <span class="cmt"># Optional, helps categorize in Apps list</span>
+    <span class="py-st">'depends'</span>: [<span class="py-st">'base'</span>], <span class="cmt"># Optional (but 'base' is highly recommended)</span>
+    <span class="py-st">'data'</span>: [ <span class="cmt"># Optional: List of data files (XML, CSV)</span>
+        <span class="cmt"># 'security/ir.model.access.csv',</span>
+        <span class="cmt"># 'views/estate_property_views.xml',</span>
+    ], 
+    <span class="py-st">'demo'</span>: [ <span class="cmt"># Optional: List of demo data files</span>
+        <span class="cmt"># 'demo/demo_data.xml',</span>
+    ], 
+    <span class="py-st">'application'</span>: <span class="py-kw">True</span>, <span class="cmt"># Optional: Makes it an App</span>
+    <span class="py-st">'installable'</span>: <span class="py-kw">True</span>, <span class="cmt"># Optional: Default True</span>
+    <span class="py-st">'auto_install'</span>: <span class="py-kw">False</span>, <span class="cmt"># Optional: Default False</span>
+}</pre>
+            </div>
+        </section>
+
+        <section class="section-card cat-app-verify">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-check-double"></i></span>4. Verifying Module Recognition</h2>
+            <p class="description-text">
+                After creating the directory and the two essential files (<code class="file-name-text">__init__.py</code> and <code class="file-name-text">__manifest__.py</code> with at least the <code class="field-name-text">'name'</code> key):
+            </p>
+            <ol class="list-decimal pl-5 description-text">
+                <li><strong>Restart the Odoo Server.</strong></li>
+                <li>Go to <span class="concept-text">Apps</span> in the Odoo interface.</li>
+                <li>Click on <span class="concept-text">Update Apps List</span> (you might need to confirm a warning). Remember that the "Update Apps List" menu item is only visible if Developer Mode is activated.</li>
+                <li>Search for your module's name (e.g., "estate").</li>
+                <li>If your module does not appear, try removing the default "Apps" filter in the search bar (if you haven't set <code class="field-name-text">'application': True</code> yet).</li>
+            </ol>
+            <p class="description-text">
+                Once recognized, you can install your (currently empty) module. No new menus will appear yet as no views or actions have been defined.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        This is the first step in building your custom Odoo application.
+    </footer>
+</body>
+</html>

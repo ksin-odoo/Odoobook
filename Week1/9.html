@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Actions & Buttons: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .attribute-name-text, .tag-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .status-tag { 
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.375rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            margin-left: 0.5rem; 
+            line-height: 1.2; 
+            vertical-align: middle; 
+        }
+        .status-must-tag {
+            background-color: #fee2e2; /* Red 100 */
+            color: #b91c1c; /* Red 700 */
+            border: 1px solid #fecaca; /* Red 200 */
+        }
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-param { color: #abb2bf; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;}
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .attribute-name-text, .list-item .tag-name-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-action-intro { border-left-color: #6b7280; } .cat-action-intro .section-title { color: #4b5563; }
+        .cat-action-object { border-left-color: #8b5cf6; } .cat-action-object .section-title { color: #7c3aed; }
+        .cat-action-type { border-left-color: #0ea5e9; } .cat-action-type .section-title { color: #0284c7; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Actions & Buttons: Cheatsheet</h1>
+        <p class="subtitle">Linking UI buttons to business logic and window actions.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-action-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-mouse-pointer"></i></span>1. Introduction: Linking UI to Logic</h2>
+            <p class="description-text">
+                Beyond views and fields, Odoo applications require linking user interface elements like buttons to specific business logic or actions. This chapter focuses on how to make buttons interactive.
+            </p>
+        </section>
+
+        <section class="section-card cat-action-object">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-code"></i></span>2. Buttons Calling Python Methods (<code class="attribute-name-text">type="object"</code>)</h2>
+            <p class="description-text">
+                This is the most common way to trigger custom business logic from a button click.
+            </p>
+            <h3 class="sub-section-title">XML Button Definition:</h3>
+            <p class="description-text">
+                Add a <code class="tag-name-text">&lt;button&gt;</code> tag within your view XML (often in the <code class="tag-name-text">&lt;header&gt;</code> of a form view).
+            </p>
+            <div class="code-block"><pre><span class="xml-cmt">&lt;!-- In your form view XML --&gt;</span>
+&lt;<span class="xml-tag">form</span>&gt;
+    &lt;<span class="xml-tag">header</span>&gt;
+        &lt;<span class="xml-tag">button</span> <span class="xml-attr">name</span>=<span class="xml-val">"action_set_property_sold"</span> <span class="xml-attr">type</span>=<span class="xml-val">"object"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Set as Sold"</span> <span class="xml-attr">class</span>=<span class="xml-val">"oe_highlight"</span>/&gt;
+        &lt;<span class="xml-tag">button</span> <span class="xml-attr">name</span>=<span class="xml-val">"action_cancel_property"</span> <span class="xml-attr">type</span>=<span class="xml-val">"object"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Cancel"</span>/&gt;
+    &lt;/<span class="xml-tag">header</span>&gt;
+    &lt;<span class="xml-tag">sheet</span>&gt;
+        <span class="cmt">&lt;!-- ... your fields ... --&gt;</span>
+    &lt;/<span class="xml-tag">sheet</span>&gt;
+&lt;/<span class="xml-tag">form</span>&gt;</pre>
+            </div>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="attribute-name-text">name</code>: <span class="status-must-tag">MUST</span> be the name of the Python method to call on the model.</li>
+                <li><code class="attribute-name-text">type="object"</code>: <span class="status-must-tag">MUST</span> be set to indicate it calls a Python method.</li>
+                <li><code class="attribute-name-text">string</code>: The label displayed on the button.</li>
+                <li><code class="attribute-name-text">class</code>: Optional CSS classes for styling (e.g., <code class="xml-val">oe_highlight</code> for primary buttons).</li>
+                <li><code class="attribute-name-text">icon</code>: Optional, to use a Font Awesome icon (e.g., <code class="xml-val">fa-check</code>).</li>
+            </ul>
+
+            <h3 class="sub-section-title">Python Method Definition:</h3>
+            <p class="description-text">
+                Define a corresponding public method in your Python model.
+            </p>
+            <div class="code-block"><pre><span class="py-kw">from</span> odoo <span class="py-kw">import</span> models, fields, api, _
+<span class="py-kw">from</span> odoo.exceptions <span class="py-kw">import</span> UserError
+
+<span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span>
+    <span class="cmt"># ... other fields (e.g., state) ...</span>
+
+    <span class="py-kw">def</span> <span class="py-fn">action_set_property_sold</span>(<span class="py-kw">self</span>): <span class="cmt"># Public method (no underscore prefix)</span>
+        <span class="py-kw">for</span> <span class="py-param">prop</span> <span class="py-kw">in</span> <span class="py-kw">self</span>: <span class="cmt"># Always loop over self</span>
+            <span class="py-kw">if</span> <span class="py-param">prop</span>.<span class="py-param">state</span> == <span class="py-st">'cancelled'</span>:
+                <span class="py-kw">raise</span> <span class="py-cn">UserError</span>(_(<span class="py-st">"Cancelled properties cannot be sold."</span>))
+            <span class="py-param">prop</span>.<span class="py-param">state</span> = <span class="py-st">'sold'</span>
+        <span class="py-kw">return</span> <span class="py-kw">True</span> <span class="cmt"># MUST return something (e.g., True)</span>
+
+    <span class="py-kw">def</span> <span class="py-fn">action_cancel_property</span>(<span class="py-kw">self</span>):
+        <span class="py-kw">for</span> <span class="py-param">prop</span> <span class="py-kw">in</span> <span class="py-kw">self</span>:
+            <span class="py-kw">if</span> <span class="py-param">prop</span>.<span class="py-param">state</span> == <span class="py-st">'sold'</span>:
+                <span class="py-kw">raise</span> <span class="py-cn">UserError</span>(_(<span class="py-st">"Sold properties cannot be cancelled."</span>))
+            <span class="py-param">prop</span>.<span class="py-param">state</span> = <span class="py-st">'cancelled'</span>
+        <span class="py-kw">return</span> <span class="py-kw">True</span></pre>
+            </div>
+            <ul class="list-disc pl-5 description-text">
+                <li>Method name <span class="status-must-tag">MUST</span> match the button's <code class="attribute-name-text">name</code> attribute.</li>
+                <li>Methods called by UI buttons should be <code class="concept-text">public</code> (no leading underscore <code class="field-name-text">_</code>).</li>
+                <li><span class="status-must-tag">MUST</span> Always iterate over <code class="py-param">self</code> as the method can be called on multiple records (e.g., from a list view). Use <code class="py-kw">self.ensure_one()</code> if the logic only applies to a single record.</li>
+                <li><span class="status-must-tag">MUST</span> The method should return a value (e.g., <code class="py-kw">True</code>, or an action dictionary to redirect).</li>
+                <li>Use <code class="py-cn">odoo.exceptions.UserError</code> to raise user-friendly error messages that stop the transaction.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-action-type">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-external-link-alt"></i></span>3. Buttons Calling Window Actions (<code class="attribute-name-text">type="action"</code>)</h2>
+            <p class="description-text">
+                Buttons can also directly trigger existing window actions (<code class="model-name-text">ir.actions.act_window</code>), which might open another view, a wizard, etc.
+            </p>
+            <h3 class="sub-section-title">XML Button Definition:</h3>
+            <div class="code-block"><pre><span class="xml-cmt">&lt;!-- In your view XML --&gt;</span>
+&lt;<span class="xml-tag">button</span> <span class="xml-attr">name</span>=<span class="xml-val">"%(your_module.action_your_window_action_xml_id)d"</span> 
+        <span class="xml-attr">type</span>=<span class="xml-val">"action"</span> 
+        <span class="xml-attr">string</span>=<span class="xml-val">"Open Other View"</span>/&gt;</pre>
+            </div>
+             <ul class="list-disc pl-5 description-text">
+                <li><code class="attribute-name-text">name</code>: <span class="status-must-tag">MUST</span> be the external ID of the window action, formatted as <code class="xml-val">"%(module_name.action_xml_id)d"</code>. The <code class="xml-val">%(...)d</code> syntax is crucial for referencing the action's database ID.</li>
+                <li><code class="attribute-name-text">type="action"</code>: <span class="status-must-tag">MUST</span> be set to indicate it calls a window action.</li>
+                <li><code class="attribute-name-text">string</code>: The label displayed on the button.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Use buttons effectively to trigger business logic and navigate your Odoo application.
+    </footer>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Computed Fields & Onchanges: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .decorator-text {
+            font-family: 'Source Code Pro', monospace; background-color: #dbeafe; /* Light blue */
+            color: #1e40af; /* Dark blue */ padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text, .attribute-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .status-tag { 
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.375rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            margin-left: 0.5rem; 
+            line-height: 1.2; 
+            vertical-align: middle; 
+        }
+        .status-must-tag {
+            background-color: #fee2e2; /* Red 100 */
+            color: #b91c1c; /* Red 700 */
+            border: 1px solid #fecaca; /* Red 200 */
+        }
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-decorator { color: #61afef; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-param { color: #abb2bf; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;}
+        .code-block .py-num { color: #d19a66; }
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; 
+            padding: 0.65rem 0.9rem; margin: 0.5rem 0;
+            border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .field-name-text, .list-item .attribute-name-text, .list-item .decorator-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-co-intro { border-left-color: #6b7280; } .cat-co-intro .section-title { color: #4b5563; }
+        .cat-co-computed { border-left-color: #8b5cf6; } .cat-co-computed .section-title { color: #7c3aed; }
+        .cat-co-onchange { border-left-color: #0ea5e9; } .cat-co-onchange .section-title { color: #0284c7; }
+        .cat-co-bestpractice { border-left-color: #10b981; } .cat-co-bestpractice .section-title { color: #059669; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Computed Fields & Onchanges: Cheatsheet</h1>
+        <p class="subtitle">Dynamically calculating field values and enhancing UI interactivity.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-co-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-calculator"></i></span>1. Introduction</h2>
+            <p class="description-text">
+                Odoo allows field values to be determined by other fields (<code class="concept-text">Computed Fields</code>) or to react to user input in forms (<code class="concept-text">Onchanges</code>). This involves writing Python logic within your model definitions.
+            </p>
+        </section>
+
+        <section class="section-card cat-co-computed">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-brain"></i></span>2. Computed Fields</h2>
+            <p class="description-text">
+                A computed field's value is not stored directly in the database but calculated on-the-fly by a Python method when the record is accessed.
+            </p>
+            <h3 class="sub-section-title">Definition:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li>Define a field (e.g., <code class="field-name-text">fields.Float</code>, <code class="field-name-text">fields.Char</code>).</li>
+                <li>Set its <code class="attribute-name-text">compute</code> attribute to the string name of a Python method in the same model (e.g., <code class="attribute-name-text">compute="_compute_my_field"</code>).</li>
+                <li>The computation method <span class="status-must-tag">MUST</span> set the value of the computed field for every record in <code class="py-param">self</code> (which is a recordset).</li>
+                <li>Conventionally, compute methods are private (name starts with <code class="field-name-text">_</code>).</li>
+            </ul>
+
+            <h3 class="sub-section-title">Dependencies (<code class="decorator-text">@api.depends</code>):</h3>
+            <p class="description-text">
+                The <code class="decorator-text">@api.depends('field1', 'related_field_id.name', ...)</code> decorator <span class="status-must-tag">MUST</span> be used on the compute method. It specifies which other fields the computation relies on. The ORM uses this to trigger recomputation when dependencies change.
+            </p>
+            <div class="code-block"><pre><span class="py-kw">from</span> odoo <span class="py-kw">import</span> api, fields, models
+
+<span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span>
+    <span class="py-param">living_area</span> = fields.<span class="py-fn">Integer</span>()
+    <span class="py-param">garden_area</span> = fields.<span class="py-fn">Integer</span>()
+    <span class="py-param">total_area</span> = fields.<span class="py-fn">Integer</span>(<span class="py-param">compute</span>=<span class="py-st">'_compute_total_area'</span>)
+
+    <span class="py-decorator">@api.depends</span>(<span class="py-st">'living_area'</span>, <span class="py-st">'garden_area'</span>) <span class="cmt"># MUST declare dependencies</span>
+    <span class="py-kw">def</span> <span class="py-fn">_compute_total_area</span>(<span class="py-kw">self</span>):
+        <span class="py-kw">for</span> <span class="py-param">prop</span> <span class="py-kw">in</span> <span class="py-kw">self</span>: <span class="cmt"># MUST iterate over self (recordset)</span>
+            <span class="py-param">prop</span>.<span class="py-param">total_area</span> = <span class="py-param">prop</span>.<span class="py-param">living_area</span> + <span class="py-param">prop</span>.<span class="py-param">garden_area</span></pre>
+            </div>
+            <div class="important-note"><strong>Self is a Recordset:</strong> Inside compute methods, <code class="py-param">self</code> is a collection of records. Always iterate over <code class="py-param">self</code> to assign the computed value to each record.</div>
+
+            <h3 class="sub-section-title">Inverse Function (<code class="attribute-name-text">inverse</code> attribute):</h3>
+            <p class="description-text">
+                Computed fields are read-only by default. To make them writable (so that setting the computed field updates its dependencies), define an <code class="attribute-name-text">inverse</code> method and assign its name to the <code class="attribute-name-text">inverse</code> attribute of the field. The inverse method sets the values of the fields the computed field depends on.
+            </p>
+            <div class="code-block"><pre><span class="py-kw">class</span> <span class="py-cn">EstatePropertyOffer</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property.offer"</span>
+    <span class="py-param">create_date</span> = fields.<span class="py-fn">Date</span>(<span class="py-param">default</span>=fields.<span class="py-fn">Date</span>.<span class="py-fn">today</span>)
+    <span class="py-param">validity</span> = fields.<span class="py-fn">Integer</span>(<span class="py-param">default</span>=<span class="py-num">7</span>)
+    <span class="py-param">date_deadline</span> = fields.<span class="py-fn">Date</span>(<span class="py-param">compute</span>=<span class="py-st">'_compute_date_deadline'</span>, <span class="py-param">inverse</span>=<span class="py-st">'_inverse_date_deadline'</span>)
+
+    <span class="py-decorator">@api.depends</span>(<span class="py-st">'create_date'</span>, <span class="py-st">'validity'</span>)
+    <span class="py-kw">def</span> <span class="py-fn">_compute_date_deadline</span>(<span class="py-kw">self</span>):
+        <span class="py-kw">for</span> <span class="py-param">offer</span> <span class="py-kw">in</span> <span class="py-kw">self</span>:
+            <span class="py-param">base_date</span> = offer.<span class="py-param">create_date</span> <span class="py-kw">or</span> fields.<span class="py-fn">Date</span>.<span class="py-fn">today</span>()
+            <span class="py-param">offer</span>.<span class="py-param">date_deadline</span> = <span class="py-param">base_date</span> + relativedelta(<span class="py-param">days</span>=offer.<span class="py-param">validity</span>)
+
+    <span class="py-kw">def</span> <span class="py-fn">_inverse_date_deadline</span>(<span class="py-kw">self</span>):
+        <span class="py-kw">for</span> <span class="py-param">offer</span> <span class="py-kw">in</span> <span class="py-kw">self</span>:
+            <span class="py-param">base_date</span> = offer.<span class="py-param">create_date</span> <span class="py-kw">or</span> fields.<span class="py-fn">Date</span>.<span class="py-fn">today</span>()
+            <span class="py-param">offer</span>.<span class="py-param">validity</span> = (offer.<span class="py-param">date_deadline</span> - <span class="py-param">base_date</span>).<span class="py-param">days</span></pre>
+            </div>
+            <p class="description-text">The <code class="attribute-name-text">inverse</code> method is called on save; the <code class="attribute-name-text">compute</code> method on dependency change.</p>
+
+            <h3 class="sub-section-title">Storage & Performance:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li>By default, computed fields are <strong>not stored</strong> in the database.</li>
+                <li><span class="status-must-tag">MUST</span> Non-stored computed fields cannot be searched on by default (unless a <code class="attribute-name-text">search</code> method is also defined).</li>
+                <li>Set <code class="attribute-name-text">store=True</code> to store the value. This allows searching but can impact performance, as changes to dependencies trigger recomputation and writes for all affected records.</li>
+                <li><span class="warning-note"><strong>Performance:</strong> Complex dependencies or chains of computed fields can lead to slow performance. Evaluate the cost carefully.</span></li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-co-onchange">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-exchange-alt"></i></span>3. Onchanges (<code class="decorator-text">@api.onchange</code>)</h2>
+            <p class="description-text">
+                The "onchange" mechanism updates other field values in a form *dynamically* as a user changes a specific field's value, without saving to the database.
+            </p>
+            <h3 class="sub-section-title">Definition:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li>Define a method in your model.</li>
+                <li>Decorate it with <code class="decorator-text">@api.onchange('field_name_trigger_1', 'field_name_trigger_2', ...)</code>.</li>
+                <li>Inside the method, <code class="py-param">self</code> represents the single record currently being edited in the form (not a recordset).</li>
+                <li>Modify other fields on <code class="py-param">self</code> to update their values in the UI form.</li>
+            </ul>
+            <div class="code-block"><pre><span class="py-kw">from</span> odoo <span class="py-kw">import</span> api, fields, models
+
+<span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span>
+    <span class="py-param">garden</span> = fields.<span class="py-fn">Boolean</span>()
+    <span class="py-param">garden_area</span> = fields.<span class="py-fn">Integer</span>()
+    <span class="py-param">garden_orientation</span> = fields.<span class="py-fn">Selection</span>([...])
+
+    <span class="py-decorator">@api.onchange</span>(<span class="py-st">'garden'</span>)
+    <span class="py-kw">def</span> <span class="py-fn">_onchange_garden</span>(<span class="py-kw">self</span>): <span class="cmt"># self is a single record here</span>
+        <span class="py-kw">if</span> <span class="py-kw">self</span>.<span class="py-param">garden</span>:
+            <span class="py-kw">self</span>.<span class="py-param">garden_area</span> = <span class="py-num">10</span>
+            <span class="py-kw">self</span>.<span class="py-param">garden_orientation</span> = <span class="py-st">'north'</span>
+        <span class="py-kw">else</span>:
+            <span class="py-kw">self</span>.<span class="py-param">garden_area</span> = <span class="py-num">0</span>
+            <span class="py-kw">self</span>.<span class="py-param">garden_orientation</span> = <span class="py-kw">False</span></pre>
+            </div>
+            <div class="important-note">Onchange methods can also return a warning message to the user's UI.</div>
+        </section>
+
+        <section class="section-card cat-co-bestpractice">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-thumbs-up"></i></span>4. Computed Fields vs. Onchanges: Best Practices</h2>
+            <ul class="list-disc pl-5 description-text">
+                <li><strong>Prefer Computed Fields for Logic:</strong> They are triggered consistently (UI and programmatic changes). Onchanges are UI-only.</li>
+                <li><span class="danger-note"><strong>Never use Onchanges for Business Logic:</strong></span> They are not triggered by programmatic record creation/updates. Business logic belongs in computed fields (especially if stored) or standard model methods.</li>
+                <li><strong>Avoid "Too Smart" Automation:</strong> Excessive logic in either can confuse users.</li>
+                <li><strong>Debugging:</strong> Computed fields can be easier to trace. Onchanges can become complex if multiple methods affect the same fields.</li>
+                <li><strong>Performance (Computed Fields):</strong> Be cautious with <code class="attribute-name-text">store=True</code> and complex dependencies.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Use computed fields and onchanges thoughtfully to enhance data integrity and user experience.
+    </footer>
+</body>
+</html>

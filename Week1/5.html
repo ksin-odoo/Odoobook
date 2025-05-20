@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo UI Basics: Actions & Menus - Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .file-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #d1fae5; 
+            color: #065f46; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text, .attribute-name-text, .model-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .status-tag { 
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.375rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            margin-left: 0.5rem; 
+            line-height: 1.2; 
+            vertical-align: middle; 
+        }
+        .status-must-tag {
+            background-color: #fee2e2; /* Red 100 */
+            color: #b91c1c; /* Red 700 */
+            border: 1px solid #fecaca; /* Red 200 */
+        }
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;}
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-param { color: #abb2bf; }
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; 
+            padding: 0.65rem 0.9rem; margin: 0.5rem 0;
+            border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .field-name-text, .list-item .attribute-name-text, .list-item .model-name-text { font-size: 0.85rem; }
+        
+        .options-list-container { 
+            margin-top: 0.25rem; 
+            margin-bottom: 0.75rem;
+            border: 1px solid #d1d5db; 
+            border-radius: 0.5rem; 
+            background-color: #ffffff; 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); 
+        }
+        .options-list-label { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-weight: normal; 
+            color: #374151; 
+            padding: 0.6rem 0.8rem; 
+            background-color: #f9fafb; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: background-color 0.2s, border-radius 0.1s;
+        }
+        .options-list-label.open { 
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom: 1px solid #e5e7eb; 
+        }
+        .options-list-label:hover {
+            background-color: #f3f4f6; 
+        }
+        .options-list-label .toggle-icon {
+            transition: transform 0.3s ease;
+            color: #6b7280; 
+            font-size: 0.8em; 
+        }
+        .options-list-label.open .toggle-icon {
+            transform: rotate(90deg);
+        }
+        .options-list { 
+            padding: 0.8rem; 
+            display: none; 
+            border-top: none; 
+        }
+        .options-list.open {
+            display: block; 
+        }
+        .options-list dt {
+            font-weight: 600;
+            color: #111827; 
+            margin-top: 0.5rem; 
+        }
+        .options-list dt:first-child {
+            margin-top: 0;
+        }
+        .options-list dd {
+            margin-left: 1.5rem; 
+            color: #4b5563; 
+            font-size: 0.875rem; 
+            margin-bottom: 0.5rem; 
+            padding-left: 0.75rem; 
+            border-left: 3px solid #9ca3af; 
+        }
+
+        /* Category Colors */
+        .cat-ui-intro { border-left-color: #6b7280; } .cat-ui-intro .section-title { color: #4b5563; }
+        .cat-ui-actions { border-left-color: #8b5cf6; } .cat-ui-actions .section-title { color: #7c3aed; }
+        .cat-ui-menus { border-left-color: #0ea5e9; } .cat-ui-menus .section-title { color: #0284c7; }
+        .cat-ui-fields { border-left-color: #10b981; } .cat-ui-fields .section-title { color: #059669; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo UI Basics: Actions & Menus - Cheatsheet</h1>
+        <p class="subtitle">Defining user interface elements like actions and menus in Odoo.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-ui-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-desktop"></i></span>1. UI Definition with Data Files (XML)</h2>
+            <p class="description-text">
+                In Odoo, the user interface (actions, menus, views) is largely defined by creating and composing records in XML data files. CSV is convenient for simple data, but XML is preferred for complex structures like UI elements.
+            </p>
+            <ul class="list-disc pl-5 description-text">
+                <li>XML files for UI elements are typically placed in the <code class="file-name-text">views/</code> folder of your module.</li>
+                <li>These files <span class="status-must-tag">MUST</span> be declared in the <code class="field-name-text">'data'</code> list within the module's <code class="file-name-text">__manifest__.py</code>.</li>
+                <li>Data files are loaded sequentially; ensure dependencies are loaded first.</li>
+            </ul>
+            <div class="important-note">Data from these files (actions, menus, views) is loaded only when a module is installed or updated.</div>
+            <p class="description-text">A common UI pattern is: <code class="concept-text">Menu</code> -> <code class="concept-text">Action</code> -> <code class="concept-text">View</code>.</p>
+        </section>
+
+        <section class="section-card cat-ui-actions">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-cogs"></i></span>2. Actions (<code class="model-name-text">ir.actions.act_window</code>)</h2>
+            <p class="description-text">
+                Window Actions link menu items to models and define which views are available (e.g., list, form).
+            </p>
+            <h3 class="sub-section-title">Basic Window Action Definition (XML):</h3>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_property_action"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.actions.act_window"</span>&gt; <span class="cmt">&lt;!-- id & model are MUST --&gt;</span>
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;Properties&lt;/<span class="xml-tag">field</span>&gt; <span class="cmt">&lt;!-- User-friendly name: MUST --&gt;</span>
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"res_model"</span>&gt;estate.property&lt;/<span class="xml-tag">field</span>&gt; <span class="cmt">&lt;!-- Target model: MUST --&gt;</span>
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"view_mode"</span>&gt;tree,form,kanban&lt;/<span class="xml-tag">field</span>&gt; <span class="cmt">&lt;!-- Available view types: MUST --&gt;</span>
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"context"</span>&gt;{'search_default_my_filter': 1}&lt;/<span class="xml-tag">field</span>&gt; <span class="cmt">&lt;!-- Optional: Default context --&gt;</span>
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"help"</span> <span class="xml-attr">type</span>=<span class="xml-val">"html"</span>&gt; <span class="cmt">&lt;!-- Optional: Help message for empty views --&gt;</span>
+        &lt;<span class="xml-tag">p</span> <span class="xml-attr">class</span>=<span class="xml-val">"o_view_nocontent_smiling_face"</span>&gt;
+            Create a new property!
+        &lt;/<span class="xml-tag">p</span>&gt;
+    &lt;/<span class="xml-tag">field</span>&gt;
+&lt;/<span class="xml-tag">record</span>&gt;</pre>
+            </div>
+            <p class="description-text">Key fields for <code class="model-name-text">ir.actions.act_window</code>:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><code class="attribute-name-text">id</code>: Unique external identifier. <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="attribute-name-text">model</code>: Fixed value <code class="model-name-text">ir.actions.act_window</code>. <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="field-name-text">name</code>: The display name of the action. <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="field-name-text">res_model</code>: The technical name of the target model for this action. <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="field-name-text">view_mode</code>: Comma-separated list of view types to be available (e.g., <code class="xml-val">tree,form,kanban,graph,pivot,calendar,activity</code>). The first one is the default. <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="field-name-text">context</code>: Dictionary (as string) to pass default context to views.</li>
+                <li class="list-item"><code class="field-name-text">domain</code>: Default domain (filter) to apply to the views.</li>
+                <li class="list-item"><code class="field-name-text">help</code>: HTML content displayed on empty views.</li>
+                <li class="list-item"><code class="field-name-text">target</code>: How the action view is displayed (e.g., <code class="xml-val">current</code>, <code class="xml-val">new</code> for popups, <code class="xml-val">inline</code>).</li>
+            </ul>
+            <p class="description-text">To use this action, create an XML file (e.g., <code class="file-name-text">estate_property_views.xml</code> in <code class="file-name-text">views/</code>) and declare it in <code class="file-name-text">__manifest__.py</code>.</p>
+        </section>
+
+        <section class="section-card cat-ui-menus">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-bars"></i></span>3. Menus (<code class="model-name-text">ir.ui.menu</code> &amp; <code class="concept-text">&lt;menuitem&gt;</code>)</h2>
+            <p class="description-text">
+                Menus provide navigation to actions. Odoo uses a hierarchical menu structure. The <code class="concept-text">&lt;menuitem&gt;</code> tag is a shortcut for creating <code class="model-name-text">ir.ui.menu</code> records.
+            </p>
+            <h3 class="sub-section-title">Typical Menu Levels:</h3>
+            <ol class="list-decimal pl-5 description-text">
+                <li><strong>Root Menu:</strong> Appears in the App switcher (main Odoo navigation).</li>
+                <li><strong>First-Level Menu:</strong> Displayed in the top bar of an application.</li>
+                <li><strong>Action Menus:</strong> Leaf menus that trigger an action.</li>
+            </ol>
+            <h3 class="sub-section-title">Defining Menus with <code class="concept-text">&lt;menuitem&gt;</code>:</h3>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">odoo</span>&gt;
+    <span class="cmt">&lt;!-- Root Menu (App Menu) --&gt;</span>
+    &lt;<span class="xml-tag">menuitem</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_menu_root"</span> 
+              <span class="xml-attr">name</span>=<span class="xml-val">"Real Estate"</span> 
+              <span class="xml-attr">sequence</span>=<span class="xml-val">"10"</span>/&gt; <span class="cmt">&lt;!-- id & name are MUST --&gt;</span>
+
+    <span class="cmt">&lt;!-- First Level Menu (under Root) --&gt;</span>
+    &lt;<span class="xml-tag">menuitem</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_first_level_menu"</span> 
+              <span class="xml-attr">name</span>=<span class="xml-val">"Advertisements"</span> 
+              <span class="xml-attr">parent</span>=<span class="xml-val">"estate_menu_root"</span> 
+              <span class="xml-attr">sequence</span>=<span class="xml-val">"10"</span>/&gt; <span class="cmt">&lt;!-- id, name & parent are MUST --&gt;</span>
+
+    <span class="cmt">&lt;!-- Action Menu (links to an action) --&gt;</span>
+    &lt;<span class="xml-tag">menuitem</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_property_menu_action"</span> 
+              <span class="xml-attr">action</span>=<span class="xml-val">"estate_property_action"</span> <span class="cmt">&lt;!-- MUST link to action's id --&gt;</span>
+              <span class="xml-attr">parent</span>=<span class="xml-val">"estate_first_level_menu"</span>
+              <span class="xml-attr">sequence</span>=<span class="xml-val">"10"</span>/&gt; <span class="cmt">&lt;!-- id, action & parent are MUST. Name comes from action. --&gt;</span>
+&lt;/<span class="xml-tag">odoo</span>&gt;</pre>
+            </div>
+            <p class="description-text">Key attributes for <code class="concept-text">&lt;menuitem&gt;</code>:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><code class="attribute-name-text">id</code>: Unique external identifier. <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="attribute-name-text">name</code>: Display name for the menu. <span class="status-must-tag">MUST</span> for root and first-level menus. For action menus, it's taken from the linked action if not specified.</li>
+                <li class="list-item"><code class="attribute-name-text">action</code>: External ID of the <code class="model-name-text">ir.actions.act_window</code> to trigger. <span class="status-must-tag">MUST</span> for action menus.</li>
+                <li class="list-item"><code class="attribute-name-text">parent</code>: External ID of the parent menu item. <span class="status-must-tag">MUST</span> for sub-menus.</li>
+                <li class="list-item"><code class="attribute-name-text">sequence</code>: Integer to control menu order (lower numbers appear first).</li>
+                <li class="list-item"><code class="attribute-name-text">groups</code>: Comma-separated list of security group XML IDs to restrict visibility.</li>
+                <li class="list-item"><code class="attribute-name-text">web_icon</code>: For root menus, specifies the icon (e.g., <code class="xml-val">"my_module,static/description/icon.png"</code>).</li>
+            </ul>
+            <p class="description-text">Create a separate XML file (e.g., <code class="file-name-text">estate_menus.xml</code> in <code class="file-name-text">views/</code>) for menus and declare it in <code class="file-name-text">__manifest__.py</code> *after* the action file it refers to.</p>
+        </section>
+
+        <section class="section-card cat-ui-fields">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-edit"></i></span>4. Fine-Tuning Views via Model & Field Attributes</h2>
+            <p class="description-text">
+                Model field attributes (defined in Python) can influence their behavior and appearance in views without directly modifying the view XML.
+            </p>
+            <h3 class="sub-section-title">Default Values:</h3>
+            <p class="description-text">Set default values for fields using the <code class="attribute-name-text">default</code> attribute in the field definition.</p>
+            <div class="code-block"><pre><span class="py-kw">from</span> odoo <span class="py-kw">import</span> fields, models
+<span class="py-kw">from</span> dateutil.relativedelta <span class="py-kw">import</span> relativedelta
+
+<span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span>
+    
+    <span class="py-param">bedrooms</span> = fields.<span class="py-fn">Integer</span>(<span class="py-param">default</span>=<span class="py-num">2</span>)
+    <span class="py-param">date_availability</span> = fields.<span class="py-fn">Date</span>(<span class="py-param">string</span>=<span class="py-st">"Available From"</span>, 
+                                  <span class="py-param">default</span>=<span class="py-kw">lambda</span> <span class="py-param">self</span>: fields.<span class="py-fn">Date</span>.<span class="py-fn">today</span>() + relativedelta(<span class="py-param">months</span>=<span class="py-num">3</span>))</pre>
+            </div>
+             <p class="description-text">The <code class="attribute-name-text">default</code> can be a literal value or a function (often a lambda) that returns the value.</p>
+
+            <h3 class="sub-section-title">Other Useful Field Attributes for UI:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><code class="attribute-name-text">readonly="True"</code>: Makes the field non-editable in the UI.</li>
+                <li class="list-item"><code class="attribute-name-text">copy="False"</code>: Prevents the field's value from being copied when a record is duplicated.</li>
+            </ul>
+
+            <h3 class="sub-section-title">Reserved Fields with Special UI Behavior:</h3>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><code class="field-name-text">active</code> (Boolean): If <code class="py-kw">False</code>, the record is typically hidden from default searches and list views.
+                    <div class="important-note">Set <code class="attribute-name-text">default=True</code> for <code class="field-name-text">active</code> if you want new records to be visible by default.</div>
+                </li>
+                <li class="list-item"><code class="field-name-text">state</code> (Selection): Often used for workflows and can be linked to statusbar widgets in form views.
+                    <div class="code-block"><pre><span class="py-param">state</span> = fields.<span class="py-fn">Selection</span>(
+    <span class="py-param">selection</span>=[
+        (<span class="py-st">'new'</span>, <span class="py-st">'New'</span>),
+        (<span class="py-st">'offer_received'</span>, <span class="py-st">'Offer Received'</span>),
+        (<span class="py-st">'offer_accepted'</span>, <span class="py-st">'Offer Accepted'</span>),
+        (<span class="py-st">'sold'</span>, <span class="py-st">'Sold'</span>),
+        (<span class="py-st">'cancelled'</span>, <span class="py-st">'Cancelled')</span>,
+    ],
+    <span class="py-param">string</span>=<span class="py-st">"Status"</span>, <span class="py-param">required</span>=<span class="py-kw">True</span>, <span class="py-param">copy</span>=<span class="py-kw">False</span>, <span class="py-param">default</span>=<span class="py-st">'new'</span>
+)</pre></div>
+                </li>
+            </ul>
+             <p class="description-text">Remember to restart Odoo and update your module (<code class="file-name-text">-u your_module</code>) after making Python changes or adding/modifying XML data files.</p>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Defining actions and menus is key to building a navigable Odoo application.
+    </footer>
+    <script>
+        function toggleOptionsList(labelElement) {
+            const optionsList = labelElement.nextElementSibling; // The <dl class="options-list">
+            const icon = labelElement.querySelector('.toggle-icon i');
+            if (optionsList.style.display === 'none' || optionsList.style.display === '') {
+                optionsList.style.display = 'block';
+                labelElement.classList.add('open');
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                optionsList.style.display = 'none';
+                labelElement.classList.remove('open');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            }
+        }
+
+        // Initialize all dropdowns to be closed
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.options-list-label .toggle-icon i').forEach(icon => {
+                icon.classList.remove('fa-chevron-down'); // Ensure it starts closed
+                icon.classList.add('fa-chevron-right');
+            });
+            document.querySelectorAll('.options-list').forEach(list => {
+                list.style.display = 'none'; // Ensure content is hidden initially
+            });
+        });
+    </script>
+</body>
+</html>

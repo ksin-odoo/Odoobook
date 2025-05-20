@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Models & Basic Fields: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .file-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #d1fae5; 
+            color: #065f46; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text, .attribute-name-text, .model-attribute-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+
+        /* Text-based Status Tags - for end of line */
+        .status-tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.375rem; /* Tailwind's rounded-md */
+            font-size: 0.75rem; /* Tailwind's text-xs */
+            font-weight: 600; /* Tailwind's font-semibold */
+            text-transform: uppercase;
+            margin-left: 0.5rem; /* Space before the tag */
+            line-height: 1.2; /* Adjust line height for small tags */
+            vertical-align: middle; /* Align with text */
+        }
+        .status-must-tag {
+            background-color: #fee2e2; /* Red 100 */
+            color: #b91c1c; /* Red 700 */
+            border: 1px solid #fecaca; /* Red 200 */
+        }
+        /* Optional and Recommended tags are removed, so their styles can be removed or set to display:none if preferred */
+        .status-optional-tag, .status-recommended-tag {
+            display: none;
+        }
+
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .py-kw { color: #c678dd; } 
+        .code-block .py-st { color: #98c379; } 
+        .code-block .py-meta { color: #e5c07b; font-style: italic;}
+        .code-block .py-cn { color: #e5c07b; } 
+        .code-block .py-fn { color: #61afef; } 
+        .code-block .py-param { color: #abb2bf; }
+        .code-block .sql-kw { color: #c678dd; }
+        .code-block .sql-tbl { color: #e06c75; }
+        .code-block .sql-prompt { color: #61afef; }
+
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; 
+            padding: 0.65rem 0.9rem; margin: 0.5rem 0;
+            border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { 
+            margin-bottom: 0.65rem; 
+            font-size: 0.875rem; 
+        }
+        .list-item .field-name-text, .list-item .attribute-name-text, .list-item .model-attribute-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-model-intro { border-left-color: #6b7280; } .cat-model-intro .section-title { color: #4b5563; }
+        .cat-model-def { border-left-color: #8b5cf6; } .cat-model-def .section-title { color: #7c3aed; }
+        .cat-model-fields { border-left-color: #0ea5e9; } .cat-model-fields .section-title { color: #0284c7; }
+        .cat-model-auto { border-left-color: #10b981; } .cat-model-auto .section-title { color: #059669; }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Models & Basic Fields: Cheatsheet</h1>
+        <p class="subtitle">Defining data structures and their attributes in Odoo.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-model-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-layer-group"></i></span>1. Object-Relational Mapping (ORM)</h2>
+            <p class="description-text">
+                Odoo's ORM layer is a key component that abstracts database interactions. It allows developers to define business objects as Python classes, and the ORM handles the mapping to database tables and columns. This avoids writing most SQL manually and provides extensibility and security.
+            </p>
+            <div class="warning-note"><strong>Mutable Global Variables:</strong> Do not use them. Odoo instances can run multiple databases, and module states vary, making global variables unreliable.</div>
+        </section>
+
+        <section class="section-card cat-model-def">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-cube"></i></span>2. Defining a Model</h2>
+            <p class="description-text">
+                Business objects are Python classes inheriting from <code class="concept-text">models.Model</code>. This integrates them into Odoo's persistence system.
+            </p>
+            <h3 class="sub-section-title">Minimal Model Definition:</h3>
+            <div class="code-block"><pre><span class="py-kw">from</span> odoo <span class="py-kw">import</span> models, fields <span class="cmt"># fields will be used later</span>
+
+<span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>): <span class="cmt"># Inherit from models.Model</span>
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span> <span class="cmt"># MUST: Unique technical name for the model</span>
+    <span class="py-meta">_description</span> = <span class="py-st">"Real Estate Property"</span> <span class="cmt"># Recommended: User-friendly description</span></pre>
+            </div>
+            <p class="description-text">Key Model Attributes:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><code class="model-attribute-text">_name</code> (String): This is the unique technical name used by Odoo to refer to this model (e.g., for relational fields, security rules). Convention: use dots (e.g., <code class="file-name-text">project.task</code>). The ORM generates a database table named by replacing dots with underscores (e.g., <code class="file-name-text">project_task</code>). <span class="status-must-tag">MUST</span></li>
+                <li class="list-item"><code class="model-attribute-text">_description</code> (String): A human-readable description of the model's purpose. </li>
+                <li class="list-item"><code class="model-attribute-text">_inherit</code>, <code class="model-attribute-text">_inherits</code>: For model inheritance (covered in later chapters). </li>
+                <li class="list-item"><code class="model-attribute-text">_order</code>: Default sorting for records when browsed. </li>
+                <li class="list-item"><code class="model-attribute-text">_sql_constraints</code>: Define database-level constraints. </li>
+            </ul>
+            <h3 class="sub-section-title">File Structure & Module Update:</h3>
+            <ol class="list-decimal pl-5 description-text">
+                <li>Create model definitions in the <code class="file-name-text">models/</code> directory (e.g., <code class="file-name-text">models/estate_property.py</code>).</li>
+                <li>Import the model file in <code class="file-name-text">models/__init__.py</code> (e.g., <code class="py-kw">from . import estate_property</code>).</li>
+                <li>Import the <code class="file-name-text">models</code> folder in the module's root <code class="file-name-text">__init__.py</code> (e.g., <code class="py-kw">from . import models</code>).</li>
+                <li>After adding/modifying Python files (models), **restart the Odoo server**. <span class="status-must-tag">MUST</span></li>
+                <li>To apply database schema changes (like creating a new table for your model), **update your module** via the command line or Apps menu. <span class="status-must-tag">MUST</span>
+                    <div class="code-block"><pre><span class="shell-prompt">$</span> <span class="shell-cmd">./odoo-bin</span> <span class="shell-opt">--addons-path</span>=<span class="shell-arg">addons,../tutorials/</span> <span class="shell-opt">-d</span> <span class="shell-arg">your_db_name</span> <span class="shell-opt">-u</span> <span class="shell-arg">your_module_name</span></pre></div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="section-card cat-model-fields">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-th-list"></i></span>3. Model Fields</h2>
+            <p class="description-text">
+                Fields define the data that a model can store. They are declared as class attributes in the model.
+            </p>
+            <h3 class="sub-section-title">Basic Field Types:</h3>
+            <p class="description-text">These are 'simple' fields storing atomic values directly in the model's table.</p>
+            <div class="code-block"><pre><span class="py-kw">class</span> <span class="py-cn">EstateProperty</span>(models.<span class="py-cn">Model</span>):
+    <span class="py-meta">_name</span> = <span class="py-st">"estate.property"</span>
+    <span class="py-meta">_description</span> = <span class="py-st">"Real Estate Property"</span>
+
+    <span class="py-param">name</span> = fields.<span class="py-fn">Char</span>(<span class="py-param">required</span>=<span class="py-kw">True</span>) <span class="cmt"># Text string</span>
+    <span class="py-param">description</span> = fields.<span class="py-fn">Text</span>() <span class="cmt"># Multi-line text</span>
+    <span class="py-param">postcode</span> = fields.<span class="py-fn">Char</span>()
+    <span class="py-param">date_availability</span> = fields.<span class="py-fn">Date</span>() <span class="cmt"># Date (no time)</span>
+    <span class="py-param">expected_price</span> = fields.<span class="py-fn">Float</span>(<span class="py-param">required</span>=<span class="py-kw">True</span>) <span class="cmt"># Floating point number</span>
+    <span class="py-param">selling_price</span> = fields.<span class="py-fn">Float</span>(<span class="py-param">readonly</span>=<span class="py-kw">True</span>, <span class="py-param">copy</span>=<span class="py-kw">False</span>) <span class="cmt"># Example of other attributes</span>
+    <span class="py-param">bedrooms</span> = fields.<span class="py-fn">Integer</span>(<span class="py-param">default</span>=<span class="py-num">2</span>) <span class="cmt"># Integer number</span>
+    <span class="py-param">living_area</span> = fields.<span class="py-fn">Integer</span>(<span class="py-param">string</span>=<span class="py-st">"Living Area (sqm)"</span>)
+    <span class="py-param">facades</span> = fields.<span class="py-fn">Integer</span>()
+    <span class="py-param">garage</span> = fields.<span class="py-fn">Boolean</span>() <span class="cmt"># True/False</span>
+    <span class="py-param">garden</span> = fields.<span class="py-fn">Boolean</span>()
+    <span class="py-param">garden_area</span> = fields.<span class="py-fn">Integer</span>()
+    <span class="py-param">garden_orientation</span> = fields.<span class="py-fn">Selection</span>(
+        <span class="py-param">selection</span>=[
+            (<span class="py-st">'north'</span>, <span class="py-st">'North'</span>), 
+            (<span class="py-st">'south'</span>, <span class="py-st">'South'</span>), 
+            (<span class="py-st">'east'</span>, <span class="py-st">'East'</span>), 
+            (<span class="py-st">'west'</span>, <span class="py-st">'West'</span>)
+        ], 
+        <span class="py-param">string</span>=<span class="py-st">"Garden Orientation"</span>,
+        <span class="py-param">help</span>=<span class="py-st">"Orientation of the property's garden"</span>
+    ) <span class="cmt"># Predefined list of choices</span></pre>
+            </div>
+            <p class="description-text">Other simple types include <code class="field-name-text">Html</code>, <code class="field-name-text">Binary</code>, <code class="field-name-text">Monetary</code>, <code class="field-name-text">Datetime</code>.</p>
+            
+            <h3 class="sub-section-title">Common Field Attributes:</h3>
+            <p class="description-text">All field types accept common configuration attributes:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li class="list-item"><code class="attribute-name-text">string</code> (String): User-friendly label for the field in the UI. Defaults to a capitalized version of the field name. </li>
+                <li class="list-item"><code class="attribute-name-text">required</code> (Boolean, default: <code class="py-kw">False</code>): If <code class="py-kw">True</code>, the field cannot be empty. A database <code class="sql-kw">NOT NULL</code> constraint is added. </li>
+                <li class="list-item"><code class="attribute-name-text">help</code> (String): Tooltip text displayed to users in the UI. </li>
+                <li class="list-item"><code class="attribute-name-text">index</code> (Boolean, default: <code class="py-kw">False</code>): If <code class="py-kw">True</code>, a database index is created on this field's column, which can speed up searches. </li>
+                <li class="list-item"><code class="attribute-name-text">default</code>: A static value or a callable (function/method name as string) to provide a default value for new records. </li>
+                <li class="list-item"><code class="attribute-name-text">readonly</code> (Boolean, default: <code class="py-kw">False</code>): If <code class="py-kw">True</code>, the field cannot be edited through the UI (can still be set by code). </li>
+                <li class="list-item"><code class="attribute-name-text">copy</code> (Boolean, default: <code class="py-kw">True</code>): If <code class="py-kw">False</code>, the field's value is not copied when a record is duplicated. </li>
+                <li class="list-item"><code class="attribute-name-text">groups</code> (String): Comma-separated list of security group XML IDs. Restricts field visibility/access to users in those groups. </li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-model-auto">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-magic"></i></span>4. Automatic Fields</h2>
+            <p class="description-text">
+                Odoo automatically adds several fields to every model. These are managed by the system.
+            </p>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="field-name-text">id</code> (Id): The unique primary key for each record.</li>
+                <li><code class="field-name-text">create_date</code> (Datetime): Timestamp of when the record was created.</li>
+                <li><code class="field-name-text">create_uid</code> (Many2one to <code class="concept-text">res.users</code>): User who created the record.</li>
+                <li><code class="field-name-text">write_date</code> (Datetime): Timestamp of the last modification.</li>
+                <li><code class="field-name-text">write_uid</code> (Many2one to <code class="concept-text">res.users</code>): User who last modified the record.</li>
+            </ul>
+            <div class="important-note">These automatic fields cannot be written to directly but can be read and used in domains, views, etc. Their creation can be disabled in some advanced cases.</div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Defining models and fields is the core of building Odoo applications.
+    </footer>
+</body>
+</html>

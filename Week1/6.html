@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odoo Basic Views: Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9fafb;
+            color: #111827; padding: 2rem; box-sizing: border-box;
+        }
+        html, body { min-height: 100%; }
+        .main-title {
+            font-size: 2rem; font-weight: 700; text-align: center;
+            margin-bottom: 0.75rem; color: #1f2937;
+        }
+        .subtitle {
+            text-align: center; color: #4b5563; margin-bottom: 2.5rem; font-size: 0.95rem;
+        }
+        .section-card {
+            background-color: #ffffff; border-radius: 0.75rem; padding: 1.75rem;
+            margin-bottom: 1.75rem; box-shadow: 0 8px 12px -3px rgba(0,0,0,0.07), 0 3px 5px -2px rgba(0,0,0,0.04);
+            border-left-width: 6px; transition: transform 0.2s ease-in-out;
+        }
+        .section-card:hover { transform: translateY(-4px); }
+        .section-title {
+            font-size: 1.4rem; font-weight: 600; margin-bottom: 1rem;
+            display: flex; align-items: center;
+        }
+        .section-title .icon {
+            margin-right: 0.65rem; font-size: 1.25rem; width: 28px; text-align: center;
+        }
+        .concept-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #f3e8ff; 
+            color: #581c87; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 600;
+        }
+        .file-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #d1fae5; 
+            color: #065f46; padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem; font-weight: 500;
+        }
+        .field-name-text, .attribute-name-text, .model-name-text, .tag-name-text { 
+            font-family: 'Source Code Pro', monospace; background-color: #eef2ff; 
+            color: #4338ca; padding: 0.1rem 0.3rem; 
+            border-radius: 0.25rem; font-weight: 600; word-break: break-all;
+        }
+        .status-tag { 
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.375rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            margin-left: 0.5rem; 
+            line-height: 1.2; 
+            vertical-align: middle; 
+        }
+        .status-must-tag {
+            background-color: #fee2e2; /* Red 100 */
+            color: #b91c1c; /* Red 700 */
+            border: 1px solid #fecaca; /* Red 200 */
+        }
+
+        .description-text {
+            font-size: 0.9rem; color: #374151; line-height: 1.55; margin-bottom: 0.85rem;
+        }
+        .code-block {
+            background-color: #282c34; color: #abb2bf; padding: 1rem;
+            border-radius: 0.5rem; overflow-x: auto; font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem; margin-top: 0.65rem; margin-bottom: 0.85rem;
+            -webkit-overflow-scrolling: touch; line-height: 1.45;
+        }
+        .code-block pre { margin: 0; white-space: pre; }
+        .code-block .cmt { color: #5c6370; font-style: italic; }
+        .code-block .xml-tag { color: #e06c75; } 
+        .code-block .xml-attr { color: #d19a66; } 
+        .code-block .xml-val { color: #98c379; } 
+        .code-block .op { color: #56b6c2; } 
+
+        .important-note {
+            background-color: #fef3c7; border-left: 4px solid #f59e0b;
+            padding: 0.65rem 0.9rem; margin: 0.85rem 0; border-radius: 0.375rem;
+            color: #92400e; font-size: 0.85rem;
+        }
+        .important-note strong { color: #78350f; }
+        .warning-note {
+            background-color: #ffedd5; border-left: 4px solid #f97316; 
+            padding: 0.65rem 0.9rem; margin: 0.5rem 0;
+            border-radius: 0.375rem;
+            color: #9a3412; font-size: 0.85rem;
+        }
+        .warning-note strong { color: #7c2d12; }
+
+        .sub-section-title {
+            font-size: 1.05rem; font-weight: 600; color: #1e40af;
+            margin-top: 1.25rem; margin-bottom: 0.65rem;
+        }
+        .list-item { margin-bottom: 0.65rem; font-size: 0.875rem; }
+        .list-item .field-name-text, .list-item .attribute-name-text, .list-item .model-name-text, .list-item .tag-name-text { font-size: 0.85rem; }
+        
+        /* Category Colors */
+        .cat-view-intro { border-left-color: #6b7280; } .cat-view-intro .section-title { color: #4b5563; }
+        .cat-view-list { border-left-color: #8b5cf6; } .cat-view-list .section-title { color: #7c3aed; }
+        .cat-view-form { border-left-color: #0ea5e9; } .cat-view-form .section-title { color: #0284c7; }
+        .cat-view-search { border-left-color: #10b981; } .cat-view-search .section-title { color: #059669; }
+        .cat-view-domains { border-left-color: #f59e0b; } .cat-view-domains .section-title { color: #d97706; }
+
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+            .main-title { font-size: 1.6rem; }
+            .subtitle { font-size: 0.85rem; margin-bottom: 1.5rem;}
+            .section-card { padding: 1.1rem; margin-bottom: 1.25rem; }
+            .section-title { font-size: 1.15rem; }
+            .section-title .icon { font-size: 1.1rem; }
+            .description-text { font-size: 0.85rem; }
+            .sub-section-title { font-size: 1rem; }
+            .code-block { font-size: 0.8rem; padding: 0.65rem; }
+            .important-note, .warning-note { font-size: 0.8rem; }
+            .list-item { font-size: 0.8rem; }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family+Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="main-title">Odoo Basic Views: Cheatsheet</h1>
+        <p class="subtitle">Defining List, Form, and Search views for Odoo models.</p>
+    </header>
+
+    <main>
+        <section class="section-card cat-view-intro">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-tv"></i></span>1. Introduction to Views</h2>
+            <p class="description-text">
+                While Odoo generates default views, custom views are <span class="status-must-tag">MUST</span> for a user-friendly business application. Views define how records of a model are displayed and interacted with.
+            </p>
+            <ul class="list-disc pl-5 description-text">
+                <li>Views are defined in XML files, typically within the <code class="file-name-text">views/</code> directory of a module.</li>
+                <li>These XML files <span class="status-must-tag">MUST</span> be declared in the <code class="field-name-text">'data'</code> list of the module's <code class="file-name-text">__manifest__.py</code>.</li>
+                <li>Views are records of the <code class="model-name-text">ir.ui.view</code> model.</li>
+                <li>Common UI flow: <code class="concept-text">Menu</code> &rarr; <code class="concept-text">Action</code> &rarr; <code class="concept-text">View</code>.</li>
+            </ul>
+             <div class="warning-note">Ensure unique <code class="attribute-name-text">id</code> attributes for each view record. Remember to set correct access rights for users to see and interact with views.</div>
+        </section>
+
+        <section class="section-card cat-view-list">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-list-ul"></i></span>2. List Views (Tree Views)</h2>
+            <p class="description-text">
+                List views (often called "tree" views) display multiple records in a tabular format.
+            </p>
+            <h3 class="sub-section-title">Basic Structure:</h3>
+            <p class="description-text">The root element is <code class="tag-name-text">&lt;list&gt;</code> (or <code class="tag-name-text">&lt;tree&gt;</code>). Inside, list the fields to display as columns.</p>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_property_view_list"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.ui.view"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;estate.property.list&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"model"</span>&gt;estate.property&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"arch"</span> <span class="xml-attr">type</span>=<span class="xml-val">"xml"</span>&gt;
+        &lt;<span class="xml-tag">list</span> <span class="xml-attr">string</span>=<span class="xml-val">"Properties"</span>&gt; <span class="cmt">&lt;!-- Root element --&gt;</span>
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"postcode"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"bedrooms"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"living_area"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Living Area (sqm)"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"expected_price"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"selling_price"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"date_availability"</span>/&gt;
+        &lt;/<span class="xml-tag">list</span>&gt;
+    &lt;/<span class="xml-tag">field</span>&gt;
+&lt;/<span class="xml-tag">record</span>&gt;</pre>
+            </div>
+            <p class="description-text">Use the <code class="attribute-name-text">string</code> attribute on <code class="tag-name-text">&lt;field&gt;</code> tags to customize column labels.</p>
+        </section>
+
+        <section class="section-card cat-view-form">
+            <h2 class="section-title"><span class="icon"><i class="far fa-file-alt"></i></span>3. Form Views</h2>
+            <p class="description-text">
+                Form views are used to create and edit single records.
+            </p>
+            <h3 class="sub-section-title">Basic Structure:</h3>
+            <p class="description-text">The root element is <code class="tag-name-text">&lt;form&gt;</code>. Common structural elements include <code class="tag-name-text">&lt;sheet&gt;</code>, <code class="tag-name-text">&lt;group&gt;</code> for layout, and <code class="tag-name-text">&lt;notebook&gt;</code> with <code class="tag-name-text">&lt;page&gt;</code> for tabs. Interactive elements are <code class="tag-name-text">&lt;field&gt;</code> and <code class="tag-name-text">&lt;button&gt;</code>.</p>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_property_view_form"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.ui.view"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;estate.property.form&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"model"</span>&gt;estate.property&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"arch"</span> <span class="xml-attr">type</span>=<span class="xml-val">"xml"</span>&gt;
+        &lt;<span class="xml-tag">form</span> <span class="xml-attr">string</span>=<span class="xml-val">"Property Details"</span>&gt;
+            &lt;<span class="xml-tag">sheet</span>&gt;
+                &lt;<span class="xml-tag">div</span> <span class="xml-attr">class</span>=<span class="xml-val">"oe_title"</span>&gt; <span class="cmt">&lt;!-- Odoo specific class for title styling --&gt;</span>
+                    &lt;<span class="xml-tag">h1</span>&gt;&lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span> <span class="xml-attr">placeholder</span>=<span class="xml-val">"e.g. Modern Apartment"</span>/&gt;&lt;/<span class="xml-tag">h1</span>&gt;
+                &lt;/<span class="xml-tag">div</span>&gt;
+                &lt;<span class="xml-tag">group</span>&gt;
+                    &lt;<span class="xml-tag">group</span> <span class="xml-attr">string</span>=<span class="xml-val">"General Info"</span>&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"state"</span> <span class="xml-attr">widget</span>=<span class="xml-val">"statusbar"</span> <span class="xml-attr">statusbar_visible</span>=<span class="xml-val">"new,offer_received,offer_accepted,sold"</span>/&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"property_type_id"</span>/&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"postcode"</span>/&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"date_availability"</span>/&gt;
+                    &lt;/<span class="xml-tag">group</span>&gt;
+                    &lt;<span class="xml-tag">group</span> <span class="xml-attr">string</span>=<span class="xml-val">"Pricing"</span>&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"expected_price"</span>/&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"selling_price"</span>/&gt;
+                    &lt;/<span class="xml-tag">group</span>&gt;
+                &lt;/<span class="xml-tag">group</span>&gt;
+                &lt;<span class="xml-tag">notebook</span>&gt;
+                    &lt;<span class="xml-tag">page</span> <span class="xml-attr">string</span>=<span class="xml-val">"Description"</span>&gt;
+                        &lt;<span class="xml-tag">group</span>&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"description"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"bedrooms"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"living_area"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"facades"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"garage"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"garden"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"garden_area"</span> <span class="xml-attr">attrs</span>=<span class="xml-val">"{'invisible': [('garden', '=', False)]}"</span>/&gt;
+                            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"garden_orientation"</span> <span class="xml-attr">attrs</span>=<span class="xml-val">"{'invisible': [('garden', '=', False)]}"</span>/&gt;
+                        &lt;/<span class="xml-tag">group</span>&gt;
+                    &lt;/<span class="xml-tag">page</span>&gt;
+                    &lt;<span class="xml-tag">page</span> <span class="xml-attr">string</span>=<span class="xml-val">"Offers"</span>&gt;
+                        &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"offer_ids"</span> <span class="xml-attr">readonly</span>=<span class="xml-val">"1"</span>&gt;
+                           <span class="cmt">&lt;!-- Tree view for offers can be defined here --&gt;</span>
+                        &lt;/<span class="xml-tag">field</span>&gt;
+                    &lt;/<span class="xml-tag">page</span>&gt;
+                &lt;/<span class="xml-tag">notebook</span>&gt;
+            &lt;/<span class="xml-tag">sheet</span>&gt;
+        &lt;/<span class="xml-tag">form</span>&gt;
+    &lt;/<span class="xml-tag">field</span>&gt;
+&lt;/<span class="xml-tag">record</span>&gt;</pre>
+            </div>
+            <div class="important-note">Use <code class="command-text">--dev xml</code> when starting Odoo to see view changes by just refreshing the browser, avoiding server restarts for XML modifications.</div>
+        </section>
+
+        <section class="section-card cat-view-search">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-search"></i></span>4. Search Views</h2>
+            <p class="description-text">
+                Search views define filters and grouping options for other views (typically List or Kanban). They don't display content themselves.
+            </p>
+            <h3 class="sub-section-title">Basic Structure:</h3>
+            <p class="description-text">The root element is <code class="tag-name-text">&lt;search&gt;</code>. Add <code class="tag-name-text">&lt;field&gt;</code> elements for fields you want to be searchable by default.</p>
+            <div class="code-block"><pre>&lt;<span class="xml-tag">record</span> <span class="xml-attr">id</span>=<span class="xml-val">"estate_property_view_search"</span> <span class="xml-attr">model</span>=<span class="xml-val">"ir.ui.view"</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>&gt;estate.property.search&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"model"</span>&gt;estate.property&lt;/<span class="xml-tag">field</span>&gt;
+    &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"arch"</span> <span class="xml-attr">type</span>=<span class="xml-val">"xml"</span>&gt;
+        &lt;<span class="xml-tag">search</span> <span class="xml-attr">string</span>=<span class="xml-val">"Search Properties"</span>&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"name"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"postcode"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"expected_price"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"bedrooms"</span>/&gt;
+            &lt;<span class="xml-tag">field</span> <span class="xml-attr">name</span>=<span class="xml-val">"living_area"</span> <span class="xml-attr">filter_domain</span>=<span class="xml-val">"[('living_area', '>=', self)]"</span>/&gt; <span class="cmt">&lt;!-- Example custom filter_domain --&gt;</span>
+            &lt;<span class="xml-tag">separator</span>/&gt;
+            &lt;<span class="xml-tag">filter</span> <span class="xml-attr">name</span>=<span class="xml-val">"filter_available"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Available"</span> <span class="xml-attr">domain</span>=<span class="xml-val">"['|', ('state', '=', 'new'), ('state', '=', 'offer_received')]"</span>/&gt;
+            &lt;<span class="xml-tag">filter</span> <span class="xml-attr">name</span>=<span class="xml-val">"filter_garden"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Has Garden"</span> <span class="xml-attr">domain</span>=<span class="xml-val">"[('garden', '=', True)]"</span>/&gt;
+            &lt;<span class="xml-tag">separator</span>/&gt;
+            &lt;<span class="xml-tag">group</span> <span class="xml-attr">expand</span>=<span class="xml-val">"1"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Group By"</span>&gt;
+                &lt;<span class="xml-tag">filter</span> <span class="xml-attr">name</span>=<span class="xml-val">"groupby_postcode"</span> <span class="xml-attr">string</span>=<span class="xml-val">"Postcode"</span> <span class="xml-attr">context</span>=<span class="xml-val">"{'group_by': 'postcode'}"</span>/&gt;
+            &lt;/<span class="xml-tag">group</span>&gt;
+        &lt;/<span class="xml-tag">search</span>&gt;
+    &lt;/<span class="xml-tag">field</span>&gt;
+&lt;/<span class="xml-tag">record</span>&gt;</pre>
+            </div>
+            <p class="description-text"><code class="tag-name-text">&lt;filter&gt;</code> elements create predefined search toggles:</p>
+            <ul class="list-disc pl-5 description-text">
+                <li><code class="attribute-name-text">name</code>: Unique identifier for the filter.</li>
+                <li><code class="attribute-name-text">string</code>: Label displayed in the UI.</li>
+                <li><code class="attribute-name-text">domain</code>: Adds the specified domain to the search.</li>
+                <li><code class="attribute-name-text">context</code>: Adds to the search context. Use <code class="xml-val">{'group_by': 'field_name'}</code> to enable grouping by that field.</li>
+            </ul>
+        </section>
+
+        <section class="section-card cat-view-domains">
+            <h2 class="section-title"><span class="icon"><i class="fas fa-filter"></i></span>5. Domains</h2>
+            <p class="description-text">
+                Domains are lists of criteria used to select a subset of records from a model. Each criterion is a triplet: <code class="concept-text">('field_name', 'operator', 'value')</code>.
+            </p>
+            <ul class="list-disc pl-5 description-text">
+                <li>Example: <code class="code-block p-2 inline-block">"[('product_type', '=', 'service'), ('unit_price', '>', 1000)]"</code> selects services with price > 1000.</li>
+                <li>Criteria are combined with an implicit <code class="op">AND</code> by default.</li>
+                <li>Logical operators <code class="op">'&'</code> (AND), <code class="op">'|'</code> (OR), <code class="op">'!'</code> (NOT) are used in prefix notation (operator before arguments).</li>
+                <li>Example with OR and NOT: <code class="code-block p-2 inline-block">"['|', ('type', '=', 'service'), '!', '&', ('price', '>=', 100), ('price', '&lt;', 200)]"</code></li>
+            </ul>
+            <div class="warning-note"><strong>XML Escaping:</strong> In XML, use <code class="field-name-text">&amp;lt;</code> for <code class="op">&lt;</code> and <code class="field-name-text">&amp;amp;</code> for <code class="op">&amp;</code> within domain strings.</div>
+        </section>
+
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-gray-500 text-sm">
+        Customizing views is essential for a tailored Odoo user experience.
+    </footer>
+    <script>
+        function toggleOptionsList(labelElement) {
+            const optionsList = labelElement.nextElementSibling; 
+            const icon = labelElement.querySelector('.toggle-icon i');
+            if (optionsList.style.display === 'none' || optionsList.style.display === '') {
+                optionsList.style.display = 'block';
+                labelElement.classList.add('open');
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                optionsList.style.display = 'none';
+                labelElement.classList.remove('open');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.options-list-label .toggle-icon i').forEach(icon => {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            });
+            document.querySelectorAll('.options-list').forEach(list => {
+                list.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
